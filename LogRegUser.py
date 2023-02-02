@@ -1,0 +1,5 @@
+
+
+
+class PanelLogRegUser():
+    pass
