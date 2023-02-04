@@ -10,7 +10,7 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     main_window = MainWindow()
     main_window.resize(500,500)
-    main_window.setWindowTitle("MAIG WAREHOUSE v1.0.1")
+    main_window.setWindowTitle("MAIG WAREHOUSE APPLICATION v1.0.1")
     main_window.show()
     app.aboutToQuit.connect(app.deleteLater)
     sys.exit(app.exec())
