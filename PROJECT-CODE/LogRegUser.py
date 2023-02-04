@@ -29,9 +29,6 @@ class MainWindow(QDialog):
         self.log_button = QPushButton("Zaloguj się")
         self.reg_button = QPushButton("Zarejestruj się")
         
-        self.log_button.enterEvent = self.mouseEnterEvent
-        self.reg_button.enterEvent = self.mouseEnterEvent
-        
         layout.addWidget(self.log_button)
         layout.addWidget(self.reg_button)
         
@@ -39,9 +36,11 @@ class MainWindow(QDialog):
         self.password_edit.setStyleSheet("color: black; font-weight: bold; font-size: 18px; background-color: lightyellow; border: 2px solid green; border-radius: 3px; font-family: Arial; margin: 10px; padding: 6px;")
 
         self.nip_form.setStyleSheet("color: black; font-weight: bold; font-size: 18px; background-color: lightyellow; border: 2px solid green; border-radius: 3px; font-family: Arial; margin: 10px; padding: 6px;")
-
+        
+        self.log_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.log_button.setStyleSheet("color: white; font-weight: bold; font-size: 20px; background-color: red; border-radius: 3px; font-family: Arial; margin: 5px; padding: 5px;")
 
+        self.reg_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.reg_button.setStyleSheet("color: white; font-weight: bold; font-size: 20px; background-color: red; border-radius: 3px; font-family: Arial; margin: 5px; padding: 5px;")
              
         pixmap = QtGui.QPixmap(r"C:\Users\mperz\Desktop\MAIG WAREHOUSE\JPEGEIMAGE\alsn20210928150320120vwuc.jpg")
@@ -52,7 +51,6 @@ class MainWindow(QDialog):
         
         self.setLayout(layout)
         
-    def mouseEnterEvent(self, event):
-        self.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+
 
         
