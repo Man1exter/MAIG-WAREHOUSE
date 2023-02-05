@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QFormLayout, QLineEdit, QPushButton 
 from PyQt5 import QtGui, QtWidgets, QtCore
+from CentralWindow import CentralWindowMain
+
 class MainWindow(QDialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -34,6 +36,7 @@ class MainWindow(QDialog):
         layout.addLayout(form)
         
         self.log_button = QPushButton("Zaloguj się")
+        self.log_button.clicked.connect(self.login_accept)
         self.reg_button = QPushButton("Zarejestruj się")
         
         layout.addWidget(self.log_button)
@@ -59,8 +62,10 @@ class MainWindow(QDialog):
         self.setLayout(layout)
         
     def login_accept(self):
-        pass
-    
+        self.central_window = CentralWindowMain()
+        self.central_window.show()
+        self.close()
+
     def registration_accept(self):
         pass
         
