@@ -4,6 +4,13 @@ class MainWindow(QDialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
+        self.setGeometry(100, 100, 500, 350)
+        
+        qr = self.frameGeometry()
+        cp = QtWidgets.QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+        
         layout = QVBoxLayout(self)
         layout.setAlignment(QtCore.Qt.AlignCenter)
 
@@ -50,6 +57,12 @@ class MainWindow(QDialog):
         self.setPalette(palette)
         
         self.setLayout(layout)
+        
+    def login_accept(self):
+        pass
+    
+    def registration_accept(self):
+        pass
         
 
 
