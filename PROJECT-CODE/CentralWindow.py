@@ -35,15 +35,21 @@ class CentralWindowMain(QDialog):
             
         navigation_layout.setAlignment(QtCore.Qt.AlignTop)
         
-        logout_button = QPushButton('Wyloguj Się 👈🏻')
+        logout_button = QPushButton('Wyloguj Się')
         logout_button.setStyleSheet("color: black; font-weight: bold; font-size: 18px; background-color: yellow; border: 2px solid black; border-radius: 3px; font-family: Arial; margin: 10px; padding: 5px;")
         logout_button.setCursor(QtCore.Qt.PointingHandCursor)
         
+        user_button = QPushButton('👤Zalogowany użytkownik: Mariusz (0/5)')
+        user_button.setStyleSheet("color: black; font-weight: bold; font-size: 18px; background-color: yellow; border: 2px solid black; border-radius: 3px; font-family: Arial; margin: 10px; padding: 5px;")
+        user_button.setCursor(QtCore.Qt.PointingHandCursor)
+        
+        bottom_layout = QHBoxLayout()
+        bottom_layout.addWidget(user_button)
+        bottom_layout.addStretch()
+        bottom_layout.addWidget(logout_button)
+
         main_layout = QVBoxLayout()
         main_layout.addLayout(navigation_layout)
-        main_layout.addWidget(logout_button, alignment=QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight)
+        main_layout.addLayout(bottom_layout)
         self.setLayout(main_layout)
             
-        main_layout = QVBoxLayout()
-        main_layout.addLayout(navigation_layout)
-        self.setLayout(main_layout)
