@@ -9,6 +9,8 @@ class CentralWindowMain(QDialog):
         width, height = screen_resolution.width() * 1.0, screen_resolution.height() * 0.98
         self.setGeometry(0, 0, width, height)
         
+        self.setWindowTitle("MAIG WAREHOUSE APPLICATION v1.0.1")
+        
         qr = self.frameGeometry()
         cp = QtWidgets.QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
@@ -39,7 +41,7 @@ class CentralWindowMain(QDialog):
         logout_button.setStyleSheet("color: black; font-weight: bold; font-size: 18px; background-color: yellow; border: 2px solid black; border-radius: 3px; font-family: Arial; margin: 10px; padding: 5px;")
         logout_button.setCursor(QtCore.Qt.PointingHandCursor)
         
-        user_button = QPushButton('👤Zalogowany użytkownik: Mariusz (0/5)')
+        user_button = QPushButton('👤Zalogowany użytkownik: Mariusz (1/5)')
         user_button.setStyleSheet("color: black; font-weight: bold; font-size: 18px; background-color: yellow; border: 2px solid black; border-radius: 3px; font-family: Arial; margin: 10px; padding: 5px;")
         user_button.setCursor(QtCore.Qt.PointingHandCursor)
         

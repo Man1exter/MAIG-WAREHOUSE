@@ -1,12 +1,14 @@
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QFormLayout, QLineEdit, QPushButton 
 from PyQt5 import QtGui, QtWidgets, QtCore
 from CentralWindow import CentralWindowMain
+from RegistrationForm import FormReg
 
 class MainWindow(QDialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
         self.setGeometry(100, 100, 500, 350)
+        self.setWindowTitle("MAIG WAREHOUSE APPLICATION v1.0.1")
         
         qr = self.frameGeometry()
         cp = QtWidgets.QDesktopWidget().availableGeometry().center()
@@ -38,6 +40,7 @@ class MainWindow(QDialog):
         self.log_button = QPushButton("Zaloguj się")
         self.log_button.clicked.connect(self.login_accept)
         self.reg_button = QPushButton("Zarejestruj się")
+        self.reg_button.clicked.connect(self.registration_accept)
         
         layout.addWidget(self.log_button)
         layout.addWidget(self.reg_button)
@@ -67,7 +70,9 @@ class MainWindow(QDialog):
         self.close()
 
     def registration_accept(self):
-        pass
+        self.central_window_reg = FormReg()
+        self.central_window_reg.show()
+
         
 
 
