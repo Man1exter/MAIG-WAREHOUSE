@@ -25,13 +25,24 @@ class CentralWindowMain(QDialog):
         self.setPalette(palette)
         
         navigation_layout = QHBoxLayout()
+        button_labels = ['Wystaw Dokument', 'Przegląd Dokumentów', 'Zakupy i Koszty', 'Przegląd Towarów', 'Klienci', 'Reklamacje', 'Raporty i Statystyki', 'Trend i Sezonowość', 'Ustawienia Programu', 'Pomoc']
         
-        for i in range(10):
-            button = QPushButton(f"Button {i+1}")
+        for label in button_labels:
+            button = QPushButton(label)
+            button.setCursor(QtCore.Qt.PointingHandCursor)
             navigation_layout.addWidget(button)
-            button.setStyleSheet("color: black; font-weight: bold; font-size: 18px; background-color: red; border: 2px solid black; border-radius: 3px; font-family: Arial; margin: 10px; padding: 6px;")
+            button.setStyleSheet("color: white; font-weight: bold; font-size: 18px; background-color: red; border: 2px solid black; border-radius: 3px; font-family: Arial; margin: 10px; padding: 5px;")
             
         navigation_layout.setAlignment(QtCore.Qt.AlignTop)
+        
+        logout_button = QPushButton('Wyloguj Się 👈🏻')
+        logout_button.setStyleSheet("color: black; font-weight: bold; font-size: 18px; background-color: yellow; border: 2px solid black; border-radius: 3px; font-family: Arial; margin: 10px; padding: 5px;")
+        logout_button.setCursor(QtCore.Qt.PointingHandCursor)
+        
+        main_layout = QVBoxLayout()
+        main_layout.addLayout(navigation_layout)
+        main_layout.addWidget(logout_button, alignment=QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight)
+        self.setLayout(main_layout)
             
         main_layout = QVBoxLayout()
         main_layout.addLayout(navigation_layout)
