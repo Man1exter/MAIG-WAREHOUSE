@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QFormLayout, QLineEdit, QPushButton 
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QFormLayout, QLineEdit, QPushButton, QHBoxLayout
 from PyQt5 import QtGui, QtWidgets, QtCore
 
 class CentralWindowMain(QDialog):
@@ -23,3 +23,16 @@ class CentralWindowMain(QDialog):
         palette = self.palette()
         palette.setBrush(QtGui.QPalette.ColorGroup.Active, QtGui.QPalette.Window, QtGui.QBrush(pixmap))
         self.setPalette(palette)
+        
+        navigation_layout = QHBoxLayout()
+        
+        for i in range(10):
+            button = QPushButton(f"Button {i+1}")
+            navigation_layout.addWidget(button)
+            button.setStyleSheet("color: black; font-weight: bold; font-size: 18px; background-color: red; border: 2px solid black; border-radius: 3px; font-family: Arial; margin: 10px; padding: 6px;")
+            
+        navigation_layout.setAlignment(QtCore.Qt.AlignTop)
+            
+        main_layout = QVBoxLayout()
+        main_layout.addLayout(navigation_layout)
+        self.setLayout(main_layout)

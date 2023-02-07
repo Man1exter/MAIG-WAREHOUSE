@@ -19,19 +19,19 @@ class MainWindow(QDialog):
         form = QFormLayout()
         self.name_edit = QLineEdit()
         form_label = QtWidgets.QLabel("Nazwa użytkownika:")
-        form_label.setStyleSheet("color: green; font-weight: bold; font-size: 18px; padding: 6px;")
+        form_label.setStyleSheet("color: red; font-weight: bold; font-size: 18px; padding: 6px;")
 
         form.addRow(form_label, self.name_edit)
         
         self.password_edit = QLineEdit()
         password_label = QtWidgets.QLabel("Hasło:")
-        password_label.setStyleSheet("color: green; font-weight: bold; font-size: 18px; padding: 6px;")
+        password_label.setStyleSheet("color: red; font-weight: bold; font-size: 18px; padding: 6px;")
         form.addRow(password_label, self.password_edit)
         self.password_edit.setEchoMode(QLineEdit.Password)
         
         self.nip_form = QLineEdit()
         nip_label = QtWidgets.QLabel("NIP:")
-        nip_label.setStyleSheet("color: green; font-weight: bold; font-size: 18px; padding: 6px;")
+        nip_label.setStyleSheet("color: red; font-weight: bold; font-size: 18px; padding: 6px;")
         form.addRow(nip_label, self.nip_form)
         layout.addLayout(form)
         
