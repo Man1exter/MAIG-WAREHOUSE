@@ -54,4 +54,34 @@ class CentralWindowMain(QDialog):
         main_layout.addLayout(navigation_layout)
         main_layout.addLayout(bottom_layout)
         self.setLayout(main_layout)
+        
+    def issue_docs(self):
+        pass
+        
+    def show_docs(self):
+        pass
+      
+    def purchases_costs(self):
+        pass
+      
+    def goods_review(self):
+        pass
+      
+    def clients(self):
+        pass
+      
+    def complain_goods(self):
+        pass
+    
+    def reports_stats(self):
+        pass
+      
+    def trends(self):
+        pass
+      
+    def settings(self):
+        pass
+    
+    def help_move(self):
+        pass
             
