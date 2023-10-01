@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QFormLayout, QLineEdit, QPushButton, QHBoxLayout, QMessageBox
 from PyQt5 import QtGui, QtWidgets, QtCore
+import sys
+import subprocess
 
 class CentralWindowMain(QDialog):
     def __init__(self, *args, **kwargs):
@@ -61,18 +63,25 @@ class CentralWindowMain(QDialog):
         confirmation.setWindowTitle('Potwierdzenie')
         confirmation.setIcon(QMessageBox.Question)
         confirmation.setText('Czy na pewno chcesz się wylogować?')
-        
+
         yes_button = confirmation.addButton('Tak', QMessageBox.YesRole)
         yes_button.setStyleSheet("background-color: green; color: white; font-weight: bold; font-size: 16px;")
-        
+
         no_button = confirmation.addButton('Nie', QMessageBox.NoRole)
         no_button.setStyleSheet("background-color: red; color: white; font-weight: bold; font-size: 16px;")
 
         confirmation.exec_()
-        
+
         if confirmation.clickedButton() == yes_button:
+            self.start_new_program()
+
+    def start_new_program(self):
+        try:
+            subprocess.Popen(["python", r"C:\Users\mperz\Desktop\MAIG WAREHOUSE\PROJECT-CODE\main.py"])
             self.close()
-        
+        except Exception as e:
+            print(f"Error starting new program: {e}")
+  
     def issue_docs(self):
         pass
         
@@ -102,4 +111,10 @@ class CentralWindowMain(QDialog):
     
     def help_move(self):
         pass
+    
+if __name__ == '__main__':
+    app = QtWidgets.QApplication(sys.argv)
+    window = CentralWindowMain()
+    window.show()
+    sys.exit(app.exec_())
             
