@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QFormLayout, QLineEdit, QPushButton, QHBoxLayout
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QFormLayout, QLineEdit, QPushButton, QHBoxLayout, QMessageBox
 from PyQt5 import QtGui, QtWidgets, QtCore
 
 class CentralWindowMain(QDialog):
@@ -40,6 +40,7 @@ class CentralWindowMain(QDialog):
         logout_button = QPushButton('Wyloguj Się')
         logout_button.setStyleSheet("color: black; font-weight: bold; font-size: 18px; background-color: yellow; border: 2px solid black; border-radius: 3px; font-family: Arial; margin: 10px; padding: 5px;")
         logout_button.setCursor(QtCore.Qt.PointingHandCursor)
+        logout_button.clicked.connect(self.logout_click)
         
         user_button = QPushButton('👤Zalogowany użytkownik: Mariusz (1/5)')
         user_button.setStyleSheet("color: black; font-weight: bold; font-size: 18px; background-color: yellow; border: 2px solid black; border-radius: 3px; font-family: Arial; margin: 10px; padding: 5px;")
@@ -56,7 +57,21 @@ class CentralWindowMain(QDialog):
         self.setLayout(main_layout)
         
     def logout_click(self):
-        pass
+        confirmation = QMessageBox(self)
+        confirmation.setWindowTitle('Potwierdzenie')
+        confirmation.setIcon(QMessageBox.Question)
+        confirmation.setText('Czy na pewno chcesz się wylogować?')
+        
+        yes_button = confirmation.addButton('Tak', QMessageBox.YesRole)
+        yes_button.setStyleSheet("background-color: green; color: white; font-weight: bold; font-size: 16px;")
+        
+        no_button = confirmation.addButton('Nie', QMessageBox.NoRole)
+        no_button.setStyleSheet("background-color: red; color: white; font-weight: bold; font-size: 16px;")
+
+        confirmation.exec_()
+        
+        if confirmation.clickedButton() == yes_button:
+            self.close()
         
     def issue_docs(self):
         pass
