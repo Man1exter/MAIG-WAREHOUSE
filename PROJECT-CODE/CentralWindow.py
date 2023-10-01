@@ -44,7 +44,7 @@ class CentralWindowMain(QDialog):
         logout_button.setCursor(QtCore.Qt.PointingHandCursor)
         logout_button.clicked.connect(self.logout_click)
         
-        user_button = QPushButton('👤Zalogowany użytkownik: Mariusz (1/5)')
+        user_button = QPushButton('Zalogowany użytkownik: Mariusz 👤')
         user_button.setStyleSheet("color: black; font-weight: bold; font-size: 18px; background-color: yellow; border: 2px solid black; border-radius: 3px; font-family: Arial; margin: 10px; padding: 5px;")
         user_button.setCursor(QtCore.Qt.PointingHandCursor)
         
