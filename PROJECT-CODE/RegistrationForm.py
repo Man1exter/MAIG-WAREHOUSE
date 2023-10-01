@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QFormLayout, QLineEdit, QPushButton, QHBoxLayout, QDesktopWidget, QMessageBox
 from PyQt5 import QtGui, QtWidgets, QtCore
+import hashlib
+import sqlite3
 
 class FormReg(QDialog):
     def __init__(self, *args, **kwargs):
