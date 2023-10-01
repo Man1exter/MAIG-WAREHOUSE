@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QFormLayout, QLineEdit, QPushButton, QHBoxLayout, QMessageBox, QTextEdit, QMenu, QAction, QListWidget
 from PyQt5 import QtGui, QtWidgets, QtCore
+from PyQt5.QtCore import Qt
 import sys
 import subprocess
 
@@ -49,6 +50,19 @@ class CentralWindowMain(QDialog):
         edit_button = QPushButton('Edytuj zadanie')
         delete_button = QPushButton('Usuń zadanie')
         
+        button_style = (
+            "color: white; font-weight: bold; font-size: 16px; background-color: blue; border: 2px solid black; "
+            "border-radius: 5px; margin: 10px; padding: 10px;"
+        )
+        
+        add_button.setStyleSheet(button_style)
+        edit_button.setStyleSheet(button_style)
+        delete_button.setStyleSheet(button_style)
+        
+        add_button.setCursor(Qt.PointingHandCursor)
+        edit_button.setCursor(Qt.PointingHandCursor)
+        delete_button.setCursor(Qt.PointingHandCursor)
+        
         add_button.clicked.connect(self.add_task)
         edit_button.clicked.connect(self.edit_task)
         delete_button.clicked.connect(self.delete_task)
@@ -67,7 +81,7 @@ class CentralWindowMain(QDialog):
         self.news_textedit.setContentsMargins(30, 30, 30, 30)
         self.news_textedit.setPlainText("Najnowsze informacje ze świata")
         
-        logout_button = QPushButton('Wyloguj Się')
+        logout_button = QPushButton('Wyloguj Się 👤')
         logout_button.setStyleSheet("color: black; font-weight: bold; font-size: 18px; background-color: yellow; border: 2px solid black; border-radius: 3px; font-family: Arial; margin: 10px; padding: 5px;")
         logout_button.setCursor(QtCore.Qt.PointingHandCursor)
         logout_button.clicked.connect(self.logout_click)
@@ -87,13 +101,13 @@ class CentralWindowMain(QDialog):
         bottom_layout.addStretch()
         bottom_layout.addWidget(logout_button)
         
-        news_layout = QHBoxLayout()  # Dodajemy nowy układ na kwadrat z najnowszymi informacjami
+        news_layout = QHBoxLayout() 
         news_layout.addWidget(self.news_textedit)
 
         main_layout = QVBoxLayout()
         main_layout.addLayout(navigation_layout)
         main_layout.addLayout(squares_layout)
-        main_layout.addLayout(news_layout)  # Dodajemy układ z kwadratem na najnowsze informacje
+        main_layout.addLayout(news_layout) 
         main_layout.addLayout(bottom_layout)
         self.setLayout(main_layout)
         
