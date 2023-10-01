@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QFormLayout, QLineEdit, QPushButton, QHBoxLayout, QMessageBox
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QFormLayout, QLineEdit, QPushButton, QHBoxLayout, QMessageBox, QTextEdit, QMenu, QAction, QListWidget
 from PyQt5 import QtGui, QtWidgets, QtCore
 import sys
 import subprocess
@@ -39,6 +39,34 @@ class CentralWindowMain(QDialog):
             
         navigation_layout.setAlignment(QtCore.Qt.AlignTop)
         
+        self.todo_listwidget = QListWidget()
+        self.todo_listwidget.setStyleSheet(
+            "font-weight: bold; font-size: 16px; background-color: lightblue; border: 2px solid black; border-radius: 5px; margin: 0px;"
+        )
+        self.todo_listwidget.setContentsMargins(30, 30, 30, 30)
+        
+        add_button = QPushButton('Dodaj nowe zadanie')
+        edit_button = QPushButton('Edytuj zadanie')
+        delete_button = QPushButton('Usuń zadanie')
+        
+        add_button.clicked.connect(self.add_task)
+        edit_button.clicked.connect(self.edit_task)
+        delete_button.clicked.connect(self.delete_task)
+        
+        self.todo_listwidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.todo_listwidget.customContextMenuRequested.connect(self.show_context_menu)
+        self.context_menu = QMenu(self)
+        delete_action = QAction('Usuń', self)
+        delete_action.triggered.connect(self.delete_task)
+        self.context_menu.addAction(delete_action)
+        
+        self.news_textedit = QTextEdit()
+        self.news_textedit.setStyleSheet(
+            "font-weight: bold; font-size: 16px; background-color: lightblue; border: 2px solid black; border-radius: 5px; padding: 10px;"
+        )
+        self.news_textedit.setContentsMargins(30, 30, 30, 30)
+        self.news_textedit.setPlainText("Najnowsze informacje ze świata")
+        
         logout_button = QPushButton('Wyloguj Się')
         logout_button.setStyleSheet("color: black; font-weight: bold; font-size: 18px; background-color: yellow; border: 2px solid black; border-radius: 3px; font-family: Arial; margin: 10px; padding: 5px;")
         logout_button.setCursor(QtCore.Qt.PointingHandCursor)
@@ -48,13 +76,24 @@ class CentralWindowMain(QDialog):
         user_button.setStyleSheet("color: black; font-weight: bold; font-size: 18px; background-color: yellow; border: 2px solid black; border-radius: 3px; font-family: Arial; margin: 10px; padding: 5px;")
         user_button.setCursor(QtCore.Qt.PointingHandCursor)
         
+        squares_layout = QHBoxLayout()
+        squares_layout.addWidget(self.todo_listwidget)
+        squares_layout.addWidget(add_button)
+        squares_layout.addWidget(edit_button)
+        squares_layout.addWidget(delete_button)
+        
         bottom_layout = QHBoxLayout()
         bottom_layout.addWidget(user_button)
         bottom_layout.addStretch()
         bottom_layout.addWidget(logout_button)
+        
+        news_layout = QHBoxLayout()  # Dodajemy nowy układ na kwadrat z najnowszymi informacjami
+        news_layout.addWidget(self.news_textedit)
 
         main_layout = QVBoxLayout()
         main_layout.addLayout(navigation_layout)
+        main_layout.addLayout(squares_layout)
+        main_layout.addLayout(news_layout)  # Dodajemy układ z kwadratem na najnowsze informacje
         main_layout.addLayout(bottom_layout)
         self.setLayout(main_layout)
         
@@ -81,6 +120,28 @@ class CentralWindowMain(QDialog):
             self.close()
         except Exception as e:
             print(f"Error starting new program: {e}")
+            
+    def add_task(self):
+        task, ok = QtWidgets.QInputDialog.getText(self, 'Dodaj nowe zadanie', 'Wprowadź nowe zadanie:')
+        if ok:
+            self.todo_listwidget.addItem(task)
+
+    def edit_task(self):
+        current_item = self.todo_listwidget.currentItem()
+        if current_item:
+            new_task, ok = QtWidgets.QInputDialog.getText(self, 'Edytuj zadanie', 'Edytuj zadanie:', text=current_item.text())
+            if ok:
+                current_item.setText(new_task)
+
+    def show_context_menu(self, position):
+        item = self.todo_listwidget.itemAt(position)
+        if item:
+            self.context_menu.exec_(self.todo_listwidget.mapToGlobal(position))
+
+    def delete_task(self):
+        current_item = self.todo_listwidget.currentItem()
+        if current_item:
+            self.todo_listwidget.takeItem(self.todo_listwidget.row(current_item))
   
     def issue_docs(self):
         pass
@@ -117,4 +178,3 @@ if __name__ == '__main__':
     window = CentralWindowMain()
     window.show()
     sys.exit(app.exec_())
-            
