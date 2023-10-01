@@ -55,6 +55,9 @@ class CentralWindowMain(QDialog):
         main_layout.addLayout(bottom_layout)
         self.setLayout(main_layout)
         
+    def logout_click(self):
+        pass
+        
     def issue_docs(self):
         pass
         
