@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 from settings import SetUserSpace
+from helpBarSection import HelpSectionClass
 import sys
 import subprocess
 
