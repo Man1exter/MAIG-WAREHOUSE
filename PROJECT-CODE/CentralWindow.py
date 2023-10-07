@@ -173,6 +173,8 @@ class CentralWindowMain(QtWidgets.QDialog):
       
     def settings(self):
         pass
+        pass
+        pass
     
     def help_move(self):
         pass
