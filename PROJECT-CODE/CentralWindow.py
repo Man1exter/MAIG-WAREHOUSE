@@ -177,6 +177,9 @@ class CentralWindowMain(QtWidgets.QDialog):
     def help_move(self):
         pass
     
+    def employee(self):
+        pass
+    
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     window = CentralWindowMain()
