@@ -40,7 +40,7 @@ class CentralWindowMain(QtWidgets.QDialog):
         
         self.todo_listwidget = QtWidgets.QListWidget()
         self.todo_listwidget.setStyleSheet(
-            "font-weight: bold; font-size: 16px; background-color: lightblue; border: 2px solid black; border-radius: 5px; margin: 0px; height: 50%;"
+            "font-weight: bold; font-size: 16px; background-color: rgba(173, 216, 230, 0.5); border: 2px solid black; border-radius: 5px; margin: 0px; padding: 10px; spacing: 10px; height: 50%;"
         )
         self.todo_listwidget.setContentsMargins(30, 30, 30, 30)
         
@@ -53,9 +53,9 @@ class CentralWindowMain(QtWidgets.QDialog):
             "border-radius: 5px; margin: 10px; padding: 10px; width: 50%;"
         )
         
-        add_button.setStyleSheet(button_style)
-        edit_button.setStyleSheet(button_style)
-        delete_button.setStyleSheet(button_style)
+        add_button.setStyleSheet(button_style + "background-color: rgba(0, 0, 255, 0.5);")  # Dodanie przezroczystości
+        edit_button.setStyleSheet(button_style + "background-color: rgba(0, 0, 255, 0.5);")
+        delete_button.setStyleSheet(button_style + "background-color: rgba(0, 0, 255, 0.5);")
         
         add_button.setCursor(QtCore.Qt.PointingHandCursor)
         edit_button.setCursor(QtCore.Qt.PointingHandCursor)
@@ -182,6 +182,7 @@ if __name__ == '__main__':
     window = CentralWindowMain()
     window.show()
     sys.exit(app.exec_())
+
 
 
        
