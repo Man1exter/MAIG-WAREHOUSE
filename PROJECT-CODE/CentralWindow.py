@@ -38,13 +38,14 @@ class CentralWindowMain(QtWidgets.QDialog):
             navigation_layout.addWidget(button)
             button.setStyleSheet("color: white; font-weight: bold; font-size: 18px; background-color: red; border: 2px solid black; border-radius: 3px; font-family: Arial; margin: 10px; padding: 5px;")
             
-        navigation_layout.setAlignment(QtCore.Qt.AlignTop)
+            if label == 'Pomoc':
+                button.clicked.connect(self.help_move)
         
-        self.todo_listwidget = QtWidgets.QListWidget()
-        self.todo_listwidget.setStyleSheet(
-            "font-weight: bold; font-size: 25px; background-color: rgba(173, 216, 230, 0.5); border: 2px solid black; border-radius: 5px; margin: 0px; padding: 10px; spacing: 10px; height: 50%;"
-        )
-        self.todo_listwidget.setContentsMargins(30, 30, 30, 30)
+        help_button = QtWidgets.QPushButton('Pomoc')
+        help_button.setStyleSheet("color: white; font-weight: bold; font-size: 18px; background-color: green; "
+                                  "border: 2px solid black; border-radius: 3px; font-family: Arial; margin: 10px; padding: 5px;")
+        help_button.setCursor(QtCore.Qt.PointingHandCursor)
+        help_button.clicked.connect(self.on_help_button_clicked)  # Połącz przycisk z funkcją on_help_button_clicked
         
         add_button = QtWidgets.QPushButton('Dodaj nowe zadanie')
         edit_button = QtWidgets.QPushButton('Edytuj zadanie')
@@ -66,6 +67,12 @@ class CentralWindowMain(QtWidgets.QDialog):
         add_button.clicked.connect(self.add_task)
         edit_button.clicked.connect(self.edit_task)
         delete_button.clicked.connect(self.delete_task)
+        
+        self.todo_listwidget = QtWidgets.QListWidget()
+        self.todo_listwidget.setStyleSheet(
+            "font-weight: bold; font-size: 25px; background-color: rgba(173, 216, 230, 0.5); border: 2px solid black; border-radius: 5px; margin: 0px; padding: 10px; spacing: 10px; height: 50%;"
+        )
+        self.todo_listwidget.setContentsMargins(30, 30, 30, 30)
         
         self.todo_listwidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.todo_listwidget.customContextMenuRequested.connect(self.show_context_menu)
@@ -181,6 +188,10 @@ class CentralWindowMain(QtWidgets.QDialog):
     def settings(self):
         pass
     
+    def on_help_button_clicked(self):
+        if self.sender().text() == 'Pomoc':
+            self.help_move()
+    
     def help_move(self):
         help_window = HelpWindow(self)
         help_window.exec_()
@@ -194,6 +205,7 @@ if __name__ == '__main__':
     window = CentralWindowMain()
     window.show()
     sys.exit(app.exec_())
+
 
 
 
