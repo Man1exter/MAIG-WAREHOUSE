@@ -26,7 +26,7 @@ class HelpWindow(QtWidgets.QDialog):
 
         
         label = QtWidgets.QLabel("Kontakt:")
-        label.setStyleSheet("font-size: 20px; font-weight: bold; color: red; margin-top: 20px;")  # Pogrubienie, rozmiar i czerwony kolor tekstu
+        label.setStyleSheet("font-size: 29px; font-weight: bold; color: green; margin-top: 20px;")  # Pogrubienie, rozmiar i czerwony kolor tekstu
         label.setAlignment(QtCore.Qt.AlignCenter)  # Wyśrodkowanie etykiety
         main_layout.addWidget(label)
 
