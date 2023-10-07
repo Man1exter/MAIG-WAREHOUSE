@@ -40,7 +40,7 @@ class CentralWindowMain(QtWidgets.QDialog):
         
         self.todo_listwidget = QtWidgets.QListWidget()
         self.todo_listwidget.setStyleSheet(
-            "font-weight: bold; font-size: 16px; background-color: rgba(173, 216, 230, 0.5); border: 2px solid black; border-radius: 5px; margin: 0px; padding: 10px; spacing: 10px; height: 50%;"
+            "font-weight: bold; font-size: 25px; background-color: rgba(173, 216, 230, 0.5); border: 2px solid black; border-radius: 5px; margin: 0px; padding: 10px; spacing: 10px; height: 50%;"
         )
         self.todo_listwidget.setContentsMargins(30, 30, 30, 30)
         
