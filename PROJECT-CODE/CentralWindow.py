@@ -1,4 +1,5 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
+from settings import SetUserSpace
 import sys
 import subprocess
 
@@ -71,6 +72,11 @@ class CentralWindowMain(QtWidgets.QDialog):
         delete_action = QtWidgets.QAction('Usuń', self)
         delete_action.triggered.connect(self.delete_task)
         self.context_menu.addAction(delete_action)
+        
+        employee_button = QtWidgets.QPushButton("JASNOŚĆ", self)
+        employee_button.setStyleSheet("background-color: yellow; color: black; font-weight: bold; font-size: 16px; border: 2px solid black; border-radius: 3px; padding: 10px;")
+        employee_button.setCursor(QtCore.Qt.PointingHandCursor)
+        employee_button.clicked.connect(self.employee)
         
         logout_button = QtWidgets.QPushButton('Wyloguj Się 👤')
         logout_button.setStyleSheet("color: black; font-weight: bold; font-size: 18px; background-color: yellow; border: 2px solid black; border-radius: 3px; font-family: Arial; margin: 10px; padding: 5px;")
@@ -173,14 +179,13 @@ class CentralWindowMain(QtWidgets.QDialog):
       
     def settings(self):
         pass
-        pass
-        pass
     
     def help_move(self):
         pass
     
     def employee(self):
-        pass
+        user_space_dialog = SetUserSpace(self)
+        user_space_dialog.exec_()
     
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
