@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 from settings import SetUserSpace
-from helpBarSection import HelpSectionClass
+from helpBarSection import HelpWindow
 import sys
 import subprocess
 
@@ -182,7 +182,8 @@ class CentralWindowMain(QtWidgets.QDialog):
         pass
     
     def help_move(self):
-        pass
+        help_window = HelpWindow(self)
+        help_window.exec_()
     
     def employee(self):
         user_space_dialog = SetUserSpace(self)
