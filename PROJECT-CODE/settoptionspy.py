@@ -22,28 +22,28 @@ class OknoUstawien(QtWidgets.QDialog):
         self.setGeometry(0, 0, 500, 300)
         self.center()
 
-        self.label1 = QtWidgets.QLabel("Ustawienie 1:")
+        self.label1 = QtWidgets.QLabel("Autozapis:")
         self.label1.setStyleSheet("font-size: 17px; font-weight: bold;")
         self.label1.setAlignment(QtCore.Qt.AlignCenter)
 
         self.combo_box1 = CenteredComboBox()
-        self.combo_box1.addItems(["Opcja 1", "Opcja 2"])
+        self.combo_box1.addItems(["Tak", "Nie"])
         self.combo_box1.setStyleSheet("font-size: 14px;")
 
-        self.label2 = QtWidgets.QLabel("Ustawienie 2:")
+        self.label2 = QtWidgets.QLabel("Możliwość płatności przelewowych termin:")
         self.label2.setStyleSheet("font-size: 17px; font-weight: bold;")
         self.label2.setAlignment(QtCore.Qt.AlignCenter)
 
         self.combo_box2 = CenteredComboBox()
-        self.combo_box2.addItems(["Opcja A", "Opcja B", "Opcja C"])
+        self.combo_box2.addItems(["30 dni", "45 dni", "90 dni"])
         self.combo_box2.setStyleSheet("font-size: 14px;")
 
-        self.label3 = QtWidgets.QLabel("Ustawienie 3:")
+        self.label3 = QtWidgets.QLabel("Powiadomienia:")
         self.label3.setStyleSheet("font-size: 17px; font-weight: bold;")
         self.label3.setAlignment(QtCore.Qt.AlignCenter)
 
         self.combo_box3 = CenteredComboBox()
-        self.combo_box3.addItems(["Opcja X", "Opcja Y", "Opcja Z"])
+        self.combo_box3.addItems(["Wyłącz", "Włącz", "Raz w miesiącu raport"])
         self.combo_box3.setStyleSheet("font-size: 14px;")
 
         self.save_button = QtWidgets.QPushButton("Zapisz Ustawienia")
