@@ -22,8 +22,14 @@ class OknoUstawien(QtWidgets.QDialog):
         self.setGeometry(0, 0, 500, 300)
         self.center()
 
+        # Ustawienie tła
+        palette = QtGui.QPalette()
+        background_image = QtGui.QImage("C:/Users/mperz/Desktop/MAIG WAREHOUSE/JPEGEIMAGE/New-World-niszczy-GPU.jpg")
+        palette.setBrush(QtGui.QPalette.Background, QtGui.QBrush(background_image))
+        self.setPalette(palette)
+
         self.label1 = QtWidgets.QLabel("Autozapis:")
-        self.label1.setStyleSheet("font-size: 17px; font-weight: bold;")
+        self.label1.setStyleSheet("font-size: 17px; font-weight: bold; color: red;")
         self.label1.setAlignment(QtCore.Qt.AlignCenter)
 
         self.combo_box1 = CenteredComboBox()
@@ -31,7 +37,7 @@ class OknoUstawien(QtWidgets.QDialog):
         self.combo_box1.setStyleSheet("font-size: 14px;")
 
         self.label2 = QtWidgets.QLabel("Możliwość płatności przelewowych termin:")
-        self.label2.setStyleSheet("font-size: 17px; font-weight: bold;")
+        self.label2.setStyleSheet("font-size: 17px; font-weight: bold; color: red;")
         self.label2.setAlignment(QtCore.Qt.AlignCenter)
 
         self.combo_box2 = CenteredComboBox()
@@ -39,7 +45,7 @@ class OknoUstawien(QtWidgets.QDialog):
         self.combo_box2.setStyleSheet("font-size: 14px;")
 
         self.label3 = QtWidgets.QLabel("Powiadomienia:")
-        self.label3.setStyleSheet("font-size: 17px; font-weight: bold;")
+        self.label3.setStyleSheet("font-size: 17px; font-weight: bold; color: red;")
         self.label3.setAlignment(QtCore.Qt.AlignCenter)
 
         self.combo_box3 = CenteredComboBox()
@@ -75,12 +81,13 @@ class OknoUstawien(QtWidgets.QDialog):
         ustawienie3 = self.combo_box3.currentText()
 
         QtWidgets.QMessageBox.information(self, "Zapisano Ustawienia", "Ustawienia zostały zapisane.")
-        self.accept() 
+        self.accept()
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     okno_ustawien = OknoUstawien()
     okno_ustawien.exec_()
+
 
 
 
