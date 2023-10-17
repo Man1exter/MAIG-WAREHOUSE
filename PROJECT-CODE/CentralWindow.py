@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 from settings import SetUserSpace
 from helpBarSection import HelpWindow
+from settoptionspy import OknoUstawien
 import sys
 import subprocess
 
@@ -40,6 +41,9 @@ class CentralWindowMain(QtWidgets.QDialog):
             
             if label == 'Pomoc':
                 button.clicked.connect(self.help_move)
+                
+            elif label == 'Ustawienia Programu':
+                button.clicked.connect(self.settings)
         
         help_button = QtWidgets.QPushButton('Pomoc')
         help_button.setStyleSheet("color: white; font-weight: bold; font-size: 18px; background-color: green; "
@@ -184,9 +188,15 @@ class CentralWindowMain(QtWidgets.QDialog):
       
     def trends(self):
         pass
+    
+    
+    def on_sett_button_clicked(self):
+        if self.sender().text() == 'Ustawienia Programu':
+            self.settings()
       
     def settings(self):
-        pass
+        sett_window = OknoUstawien()
+        sett_window.exec_()
     
     def on_help_button_clicked(self):
         if self.sender().text() == 'Pomoc':
