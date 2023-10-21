@@ -34,7 +34,7 @@ class OknoUstawien(QtWidgets.QDialog):
 
         self.combo_box1 = CenteredComboBox()
         self.combo_box1.addItems(["Tak", "Nie"])
-        self.combo_box1.setStyleSheet("font-size: 14px;")
+        self.combo_box1.setStyleSheet("font-size: 14px; font-weight: bold;")
 
         self.label2 = QtWidgets.QLabel("Możliwość płatności przelewowych termin:")
         self.label2.setStyleSheet("font-size: 17px; font-weight: bold; color: red;")
@@ -42,7 +42,7 @@ class OknoUstawien(QtWidgets.QDialog):
 
         self.combo_box2 = CenteredComboBox()
         self.combo_box2.addItems(["30 dni", "45 dni", "90 dni"])
-        self.combo_box2.setStyleSheet("font-size: 14px;")
+        self.combo_box2.setStyleSheet("font-size: 14px; font-weight: bold;")
 
         self.label3 = QtWidgets.QLabel("Powiadomienia:")
         self.label3.setStyleSheet("font-size: 17px; font-weight: bold; color: red;")
@@ -50,7 +50,7 @@ class OknoUstawien(QtWidgets.QDialog):
 
         self.combo_box3 = CenteredComboBox()
         self.combo_box3.addItems(["Wyłącz", "Włącz", "Raz w miesiącu raport"])
-        self.combo_box3.setStyleSheet("font-size: 14px;")
+        self.combo_box3.setStyleSheet("font-size: 14px; font-weight: bold;")
 
         self.save_button = QtWidgets.QPushButton("Zapisz Ustawienia")
         self.save_button.setStyleSheet("font-size: 14px; font-weight: bold; background-color: #4CAF50; color: white;")
