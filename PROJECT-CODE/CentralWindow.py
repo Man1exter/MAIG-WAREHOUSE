@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 from settings import SetUserSpace
 from helpBarSection import HelpWindow
 from settoptionspy import OknoUstawien
-from seasonoftrends import OknoTrendu
+from seasonoftrends import TrendSeasonalityWindow
 import sys
 import subprocess
 
@@ -192,7 +192,7 @@ class CentralWindowMain(QtWidgets.QDialog):
       
       
     def trends(self):
-        sett_season_window = OknoTrendu()
+        sett_season_window = TrendSeasonalityWindow()
         sett_season_window.exec_()
     
     def on_sett_button_clicked(self):
