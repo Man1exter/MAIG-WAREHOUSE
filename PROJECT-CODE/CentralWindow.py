@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 from settings import SetUserSpace
 from helpBarSection import HelpWindow
 from settoptionspy import OknoUstawien
+from seasonoftrends import OknoTrendu
 import sys
 import subprocess
 
@@ -44,6 +45,9 @@ class CentralWindowMain(QtWidgets.QDialog):
                 
             elif label == 'Ustawienia Programu':
                 button.clicked.connect(self.settings)
+                
+            elif label == 'Trend i Sezonowość':
+                button.clicked.connect(self.trends)
         
         help_button = QtWidgets.QPushButton('Pomoc')
         help_button.setStyleSheet("color: white; font-weight: bold; font-size: 18px; background-color: green; "
@@ -186,9 +190,10 @@ class CentralWindowMain(QtWidgets.QDialog):
     def reports_stats(self):
         pass
       
+      
     def trends(self):
-        pass
-    
+        sett_season_window = OknoTrendu()
+        sett_season_window.exec_()
     
     def on_sett_button_clicked(self):
         if self.sender().text() == 'Ustawienia Programu':
