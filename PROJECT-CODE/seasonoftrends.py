@@ -8,7 +8,6 @@ class TrendSeasonalityWindow(QtWidgets.QDialog):
         self.setWindowTitle("Trend i Sezonowość")
         self.setFixedSize(800, 600)
 
-        # Tło okna
         background = QtGui.QImage("C:/Users/mperz/Desktop/MAIG WAREHOUSE/JPEGEIMAGE/New-World-niszczy-GPU.jpg")
         background = background.scaled(self.size())
         palette = QtGui.QPalette()
@@ -33,7 +32,6 @@ class TrendSeasonalityWindow(QtWidgets.QDialog):
         self.fetch_data_button.setStyleSheet(
             "font-size: 16px; font-weight: bold; background: qradialgradient(cx: 0.5, cy: 0.5, fx: 0.5, fy: 0.5, radius: 1, stop: 0 #4CAF50, stop: 1 #388E3C); color: white; padding: 10px 20px; border: none; border-radius: 5px;")
 
-        # Efekt cienia pod przyciskiem
         shadow = QtWidgets.QGraphicsDropShadowEffect()
         shadow.setBlurRadius(5)
         shadow.setXOffset(2)
@@ -68,7 +66,18 @@ class TrendSeasonalityWindow(QtWidgets.QDialog):
         products = ["Krzesła", "Doniczki", "Laptopy", "Smartfony", "Telewizory", "Konsolki", "Książki", "Szklanki",
                     "Buty", "Rowery"]
         random_products = random.sample(products, 10)
-        return "\n".join(random_products)
+
+        trend_data = "\n".join(random_products)
+        cursor = self.trend_text.textCursor()
+        cursor.beginEditBlock()
+        for i in range(9, -1, -1):
+            cursor.movePosition(QtGui.QTextCursor.StartOfLine)
+            cursor.movePosition(QtGui.QTextCursor.Down, QtGui.QTextCursor.MoveAnchor, i)
+            cursor.insertText('\n' * 2)
+        cursor.endEditBlock()
+        self.trend_text.setTextCursor(cursor)
+
+        return trend_data
 
     def get_seasonality_data_from_api(self):
         import datetime
@@ -80,6 +89,7 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication([])
     trend_seasonality_window = TrendSeasonalityWindow()
     trend_seasonality_window.exec_()
+
 
 
 
