@@ -1,6 +1,6 @@
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QLineEdit, QPushButton, QTextEdit, QListWidget, QListWidgetItem, QMessageBox
-from PySide6.QtGui import QColor, QFont, QTextCursor
+from PySide6.QtGui import QColor, QFont
 from PySide6.QtCore import QDateTime, QTimer, Qt
 
 class Klient:
@@ -17,7 +17,14 @@ class KlientWindow(QMainWindow):
         self.klienci = []
 
         self.setWindowTitle("Okno Reklamacji")
-        self.setGeometry(0, 0, QApplication.primaryScreen().size().width(), QApplication.primaryScreen().size().height())
+        
+        # Pobierz dostępne ekrany
+        available_screens = QApplication.screens()
+
+        # Pobierz pierwszy dostępny ekran
+        if available_screens:
+            screen_rect = available_screens[0].availableGeometry()
+            self.setGeometry(screen_rect)
 
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
@@ -85,6 +92,9 @@ class KlientWindow(QMainWindow):
         self.timer.timeout.connect(self.odlicz_czas)
         self.timer.start(1000)  # Odświeżanie co sekundę
 
+        # Przywróć przycisk maksymalizacji okna
+        self.setWindowState(Qt.WindowMaximized)
+
     def dodaj_klienta(self):
         imie = self.edit_imie.text()
         nazwisko = self.edit_nazwisko.text()
@@ -150,7 +160,6 @@ class KlientWindow(QMainWindow):
             color = QColor(i * 20 % 255, i * 40 % 255, i * 60 % 255)  # Kolor zależny od indeksu reklamacji
             item = QListWidgetItem(f"{klient.imie} {klient.nazwisko}: {klient.reklamacja} - Do {klient.czas_na_rozpatrzenie.toString(Qt.ISODate)}", self.list_reklamacje)
             item.setBackground(color)
-            item.setForeground(QColor(255, 255, 255))  # Kolor tekstu na biały
             font = QFont()
             font.setPointSize(14)
             font.setBold(True)
@@ -175,6 +184,12 @@ if __name__ == "__main__":
     window = KlientWindow()
     window.show()
     sys.exit(app.exec_())
+
+
+
+
+
+
 
 
 
