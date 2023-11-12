@@ -1,5 +1,6 @@
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLabel, QLineEdit, QPushButton, QTextEdit, QMessageBox
+from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QLineEdit, QPushButton, QTextEdit, QListWidget, QListWidgetItem, QMessageBox
+from PySide6.QtGui import QColor, QFont
 
 class Klient:
     def __init__(self, imie, nazwisko, reklamacja):
@@ -14,40 +15,66 @@ class KlientWindow(QMainWindow):
         self.klienci = []
 
         self.setWindowTitle("Okno Reklamacji")
-        self.setGeometry(100, 100, 400, 300)
+        self.setGeometry(0, 0, QApplication.primaryScreen().size().width(), QApplication.primaryScreen().size().height())
 
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
 
-        self.layout = QVBoxLayout()
+        self.layout = QHBoxLayout()
+
+        # Lewa strona
+        self.left_layout = QVBoxLayout()
 
         self.label_imie = QLabel("Imię:", self)
+        self.label_imie.setStyleSheet("font-size: 20px; color: #003366;")
         self.edit_imie = QLineEdit(self)
+        self.edit_imie.setStyleSheet("font-size: 18px;")
 
         self.label_nazwisko = QLabel("Nazwisko:", self)
+        self.label_nazwisko.setStyleSheet("font-size: 20px; color: #003366;")
         self.edit_nazwisko = QLineEdit(self)
+        self.edit_nazwisko.setStyleSheet("font-size: 18px;")
 
         self.label_reklamacja = QLabel("Opis wady reklamacyjnej:", self)
+        self.label_reklamacja.setStyleSheet("font-size: 20px; color: #003366;")
         self.edit_reklamacja = QTextEdit(self)
+        self.edit_reklamacja.setStyleSheet("font-size: 18px;")
 
         self.button_dodaj = QPushButton("Dodaj klienta", self)
+        self.button_dodaj.setStyleSheet("font-size: 20px; background-color: #4CAF50; color: white; padding: 10px 20px;")
         self.button_dodaj.clicked.connect(self.dodaj_klienta)
 
         self.button_edytuj = QPushButton("Edytuj klienta", self)
+        self.button_edytuj.setStyleSheet("font-size: 20px; background-color: #FFD700; color: white; padding: 10px 20px;")
         self.button_edytuj.clicked.connect(self.edytuj_klienta)
 
         self.button_usun = QPushButton("Usuń klienta", self)
+        self.button_usun.setStyleSheet("font-size: 20px; background-color: #FF6347; color: white; padding: 10px 20px;")
         self.button_usun.clicked.connect(self.usun_klienta)
 
-        self.layout.addWidget(self.label_imie)
-        self.layout.addWidget(self.edit_imie)
-        self.layout.addWidget(self.label_nazwisko)
-        self.layout.addWidget(self.edit_nazwisko)
-        self.layout.addWidget(self.label_reklamacja)
-        self.layout.addWidget(self.edit_reklamacja)
-        self.layout.addWidget(self.button_dodaj)
-        self.layout.addWidget(self.button_edytuj)
-        self.layout.addWidget(self.button_usun)
+        self.left_layout.addWidget(self.label_imie)
+        self.left_layout.addWidget(self.edit_imie)
+        self.left_layout.addWidget(self.label_nazwisko)
+        self.left_layout.addWidget(self.edit_nazwisko)
+        self.left_layout.addWidget(self.label_reklamacja)
+        self.left_layout.addWidget(self.edit_reklamacja)
+        self.left_layout.addWidget(self.button_dodaj)
+        self.left_layout.addWidget(self.button_edytuj)
+        self.left_layout.addWidget(self.button_usun)
+
+        # Prawa strona
+        self.right_layout = QVBoxLayout()
+
+        self.label_reklamacje = QLabel("Aktualne reklamacje:", self)
+        self.label_reklamacje.setStyleSheet("font-size: 20px; color: #003366;")
+
+        self.list_reklamacje = QListWidget(self)
+        self.list_reklamacje.setStyleSheet("font-size: 18px;")
+        self.right_layout.addWidget(self.label_reklamacje)
+        self.right_layout.addWidget(self.list_reklamacje)
+
+        self.layout.addLayout(self.left_layout)
+        self.layout.addLayout(self.right_layout)
 
         self.central_widget.setLayout(self.layout)
 
@@ -62,6 +89,7 @@ class KlientWindow(QMainWindow):
         self.show_message("Dodano klienta", f"Dodano klienta: {imie} {nazwisko}")
 
         self.clear_inputs()
+        self.refresh_reklamacje_list()
 
     def edytuj_klienta(self):
         index = self.get_selected_index()
@@ -78,6 +106,7 @@ class KlientWindow(QMainWindow):
             self.show_message("Zaktualizowano klienta", f"Zaktualizowano klienta: {imie} {nazwisko}")
 
             self.clear_inputs()
+            self.refresh_reklamacje_list()
 
     def usun_klienta(self):
         index = self.get_selected_index()
@@ -91,6 +120,7 @@ class KlientWindow(QMainWindow):
             self.show_message("Usunięto klienta", f"Usunięto klienta: {imie} {nazwisko}")
 
             self.clear_inputs()
+            self.refresh_reklamacje_list()
 
     def clear_inputs(self):
         self.edit_imie.clear()
@@ -109,8 +139,18 @@ class KlientWindow(QMainWindow):
         msg.setText(content)
         msg.exec_()
 
+    def refresh_reklamacje_list(self):
+        self.list_reklamacje.clear()
+        for klient in self.klienci:
+            item = QListWidgetItem(f"{klient.imie} {klient.nazwisko}: {klient.reklamacja}")
+            self.list_reklamacje.addItem(item)
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app.setStyleSheet("QMainWindow {background-color: #F5F5F5;}")
     window = KlientWindow()
     window.show()
     sys.exit(app.exec_())
+
+
+
