@@ -1,6 +1,6 @@
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QLineEdit, QPushButton, QTextEdit, QListWidget, QListWidgetItem, QMessageBox
-from PySide6.QtGui import QColor, QFont
+from PySide6.QtGui import QColor, QFont, QPixmap
 from PySide6.QtCore import QDateTime, QTimer, Qt
 
 class Klient:
@@ -17,35 +17,40 @@ class KlientWindow(QMainWindow):
         self.klienci = []
 
         self.setWindowTitle("Okno Reklamacji")
-        
-        # Pobierz dostępne ekrany
+
         available_screens = QApplication.screens()
 
-        # Pobierz pierwszy dostępny ekran
         if available_screens:
             screen_rect = available_screens[0].availableGeometry()
             self.setGeometry(screen_rect)
+
+        background_image_path = r"C:\Users\mperz\Desktop\MAIG WAREHOUSE\JPEGEIMAGE\alsn20210928150320120vwuc.jpg"
+        background_image = QPixmap(background_image_path)
+        self.background_label = QLabel(self)
+        self.background_label.setPixmap(background_image)
+        self.background_label.setGeometry(0, 0, self.width(), self.height())
+
+        self.setAttribute(Qt.WA_TranslucentBackground, True)
 
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
 
         self.layout = QHBoxLayout()
 
-        # Lewa strona
         self.left_layout = QVBoxLayout()
 
         self.label_imie = QLabel("Imię:", self)
-        self.label_imie.setStyleSheet("font-size: 20px; color: #003366;")
+        self.label_imie.setStyleSheet("font-size: 20px; color: red;")
         self.edit_imie = QLineEdit(self)
         self.edit_imie.setStyleSheet("font-size: 18px;")
 
         self.label_nazwisko = QLabel("Nazwisko:", self)
-        self.label_nazwisko.setStyleSheet("font-size: 20px; color: #003366;")
+        self.label_nazwisko.setStyleSheet("font-size: 20px; color: red;")
         self.edit_nazwisko = QLineEdit(self)
         self.edit_nazwisko.setStyleSheet("font-size: 18px;")
 
         self.label_reklamacja = QLabel("Opis wady reklamacyjnej:", self)
-        self.label_reklamacja.setStyleSheet("font-size: 20px; color: #003366;")
+        self.label_reklamacja.setStyleSheet("font-size: 20px; color: red;")
         self.edit_reklamacja = QTextEdit(self)
         self.edit_reklamacja.setStyleSheet("font-size: 18px;")
 
@@ -71,14 +76,13 @@ class KlientWindow(QMainWindow):
         self.left_layout.addWidget(self.button_edytuj)
         self.left_layout.addWidget(self.button_usun)
 
-        # Prawa strona
         self.right_layout = QVBoxLayout()
 
         self.label_reklamacje = QLabel("Aktualne reklamacje:", self)
-        self.label_reklamacje.setStyleSheet("font-size: 20px; color: #003366;")
+        self.label_reklamacje.setStyleSheet("font-size: 20px; color: red;")
 
         self.list_reklamacje = QListWidget(self)
-        self.list_reklamacje.setStyleSheet("font-size: 18px;")
+        self.list_reklamacje.setStyleSheet("font-size: 18px; color: white;")  
         self.right_layout.addWidget(self.label_reklamacje)
         self.right_layout.addWidget(self.list_reklamacje)
 
@@ -87,12 +91,10 @@ class KlientWindow(QMainWindow):
 
         self.central_widget.setLayout(self.layout)
 
-        # Timer do odliczania czasu
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.odlicz_czas)
-        self.timer.start(1000)  # Odświeżanie co sekundę
-
-        # Przywróć przycisk maksymalizacji okna
+        self.timer.start(1000)  
+ 
         self.setWindowState(Qt.WindowMaximized)
 
     def dodaj_klienta(self):
@@ -157,7 +159,7 @@ class KlientWindow(QMainWindow):
     def refresh_reklamacje_list(self):
         self.list_reklamacje.clear()
         for i, klient in enumerate(self.klienci):
-            color = QColor(i * 20 % 255, i * 40 % 255, i * 60 % 255)  # Kolor zależny od indeksu reklamacji
+            color = QColor(i * 20 % 255, i * 40 % 255, i * 60 % 255)  
             item = QListWidgetItem(f"{klient.imie} {klient.nazwisko}: {klient.reklamacja} - Do {klient.czas_na_rozpatrzenie.toString(Qt.ISODate)}", self.list_reklamacje)
             item.setBackground(color)
             font = QFont()
@@ -180,10 +182,14 @@ class KlientWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setStyleSheet("QMainWindow {background-color: #F5F5F5;}")
     window = KlientWindow()
     window.show()
     sys.exit(app.exec_())
+
+
+
+
+
 
 
 
