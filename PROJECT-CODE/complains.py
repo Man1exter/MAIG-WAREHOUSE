@@ -1,12 +1,14 @@
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QLineEdit, QPushButton, QTextEdit, QListWidget, QListWidgetItem, QMessageBox
-from PySide6.QtGui import QColor, QFont
+from PySide6.QtGui import QColor, QFont, QTextCursor
+from PySide6.QtCore import QDateTime, QTimer, Qt
 
 class Klient:
-    def __init__(self, imie, nazwisko, reklamacja):
+    def __init__(self, imie, nazwisko, reklamacja, czas_na_rozpatrzenie):
         self.imie = imie
         self.nazwisko = nazwisko
         self.reklamacja = reklamacja
+        self.czas_na_rozpatrzenie = czas_na_rozpatrzenie
 
 class KlientWindow(QMainWindow):
     def __init__(self):
@@ -78,12 +80,18 @@ class KlientWindow(QMainWindow):
 
         self.central_widget.setLayout(self.layout)
 
+        # Timer do odliczania czasu
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.odlicz_czas)
+        self.timer.start(1000)  # Odświeżanie co sekundę
+
     def dodaj_klienta(self):
         imie = self.edit_imie.text()
         nazwisko = self.edit_nazwisko.text()
         reklamacja = self.edit_reklamacja.toPlainText()
+        czas_na_rozpatrzenie = QDateTime.currentDateTime().addDays(14)
 
-        klient = Klient(imie, nazwisko, reklamacja)
+        klient = Klient(imie, nazwisko, reklamacja, czas_na_rozpatrzenie)
         self.klienci.append(klient)
 
         self.show_message("Dodano klienta", f"Dodano klienta: {imie} {nazwisko}")
@@ -128,10 +136,7 @@ class KlientWindow(QMainWindow):
         self.edit_reklamacja.clear()
 
     def get_selected_index(self):
-        # Ta funkcja zwraca indeks zaznaczonego klienta lub -1, jeśli nic nie jest zaznaczone.
-        # Możesz dostosować tę funkcję w zależności od sposobu, w jaki będziesz zarządzać zaznaczonym klientem.
-        # W tym przykładzie zakładam, że zawsze będzie dostępny tylko jeden zaznaczony klient.
-        return 0 if self.klienci else -1
+        return self.list_reklamacje.currentRow()
 
     def show_message(self, title, content):
         msg = QMessageBox()
@@ -141,9 +146,28 @@ class KlientWindow(QMainWindow):
 
     def refresh_reklamacje_list(self):
         self.list_reklamacje.clear()
-        for klient in self.klienci:
-            item = QListWidgetItem(f"{klient.imie} {klient.nazwisko}: {klient.reklamacja}")
+        for i, klient in enumerate(self.klienci):
+            color = QColor(i * 20 % 255, i * 40 % 255, i * 60 % 255)  # Kolor zależny od indeksu reklamacji
+            item = QListWidgetItem(f"{klient.imie} {klient.nazwisko}: {klient.reklamacja} - Do {klient.czas_na_rozpatrzenie.toString(Qt.ISODate)}", self.list_reklamacje)
+            item.setBackground(color)
+            item.setForeground(QColor(255, 255, 255))  # Kolor tekstu na biały
+            font = QFont()
+            font.setPointSize(14)
+            font.setBold(True)
+            item.setFont(font)
             self.list_reklamacje.addItem(item)
+
+    def odlicz_czas(self):
+        for i, klient in enumerate(self.klienci):
+            czas_do_konca = QDateTime.currentDateTime().secsTo(klient.czas_na_rozpatrzenie)
+            if czas_do_konca > 0:
+                czas_do_konca_str = str(QDateTime.fromSecsSinceEpoch(czas_do_konca).toUTC().toString("hh:mm:ss"))
+            else:
+                czas_do_konca_str = "0:00:00"
+            
+            item = self.list_reklamacje.item(i)
+            if item:
+                item.setText(f"{klient.imie} {klient.nazwisko}: {klient.reklamacja} - Do {klient.czas_na_rozpatrzenie.toString(Qt.ISODate)} - Pozostało: {czas_do_konca_str}")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -151,6 +175,7 @@ if __name__ == "__main__":
     window = KlientWindow()
     window.show()
     sys.exit(app.exec_())
+
 
 
 
