@@ -1,7 +1,7 @@
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QLineEdit, QPushButton, QTextEdit, QListWidget, QListWidgetItem, QMessageBox
-from PySide6.QtGui import QColor, QFont, QPixmap
-from PySide6.QtCore import QDateTime, QTimer, Qt
+from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QLineEdit, QPushButton, QTextEdit, QListWidget, QListWidgetItem, QMessageBox
+from PyQt5.QtGui import QColor, QFont, QPixmap
+from PyQt5.QtCore import QDateTime, QTimer, Qt
 
 class Klient:
     def __init__(self, imie, nazwisko, reklamacja, czas_na_rozpatrzenie):
@@ -10,19 +10,13 @@ class Klient:
         self.reklamacja = reklamacja
         self.czas_na_rozpatrzenie = czas_na_rozpatrzenie
 
-class KlientWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
+class KlientWindow(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
         self.klienci = []
 
         self.setWindowTitle("Okno Reklamacji")
-
-        available_screens = QApplication.screens()
-
-        if available_screens:
-            screen_rect = available_screens[0].availableGeometry()
-            self.setGeometry(screen_rect)
 
         background_image_path = r"C:\Users\mperz\Desktop\MAIG WAREHOUSE\JPEGEIMAGE\alsn20210928150320120vwuc.jpg"
         background_image = QPixmap(background_image_path)
@@ -31,9 +25,6 @@ class KlientWindow(QMainWindow):
         self.background_label.setGeometry(0, 0, self.width(), self.height())
 
         self.setAttribute(Qt.WA_TranslucentBackground, True)
-
-        self.central_widget = QWidget(self)
-        self.setCentralWidget(self.central_widget)
 
         self.layout = QHBoxLayout()
 
@@ -89,7 +80,7 @@ class KlientWindow(QMainWindow):
         self.layout.addLayout(self.left_layout)
         self.layout.addLayout(self.right_layout)
 
-        self.central_widget.setLayout(self.layout)
+        self.setLayout(self.layout)  
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.odlicz_czas)
@@ -185,6 +176,8 @@ if __name__ == "__main__":
     window = KlientWindow()
     window.show()
     sys.exit(app.exec_())
+
+
 
 
 

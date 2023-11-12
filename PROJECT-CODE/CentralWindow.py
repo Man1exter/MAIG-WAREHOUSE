@@ -3,6 +3,7 @@ from settings import SetUserSpace
 from helpBarSection import HelpWindow
 from settoptionspy import OknoUstawien
 from seasonoftrends import TrendSeasonalityWindow
+from complains import KlientWindow
 import sys
 import subprocess
 
@@ -48,12 +49,16 @@ class CentralWindowMain(QtWidgets.QDialog):
                 
             elif label == 'Trend i Sezonowość':
                 button.clicked.connect(self.trends)
+            
+            elif label == 'Reklamacje':
+                button.clicked.connect(self.complain_goods)
+                
         
         help_button = QtWidgets.QPushButton('Pomoc')
         help_button.setStyleSheet("color: white; font-weight: bold; font-size: 18px; background-color: green; "
                                   "border: 2px solid black; border-radius: 3px; font-family: Arial; margin: 10px; padding: 5px;")
         help_button.setCursor(QtCore.Qt.PointingHandCursor)
-        help_button.clicked.connect(self.on_help_button_clicked)  # Połącz przycisk z funkcją on_help_button_clicked
+        help_button.clicked.connect(self.on_help_button_clicked) 
         
         add_button = QtWidgets.QPushButton('Dodaj nowe zadanie')
         edit_button = QtWidgets.QPushButton('Edytuj zadanie')
@@ -64,7 +69,7 @@ class CentralWindowMain(QtWidgets.QDialog):
             "border-radius: 5px; margin: 10px; padding: 10px; width: 50%;"
         )
         
-        add_button.setStyleSheet(button_style + "background-color: rgba(0, 0, 255, 0.5);")  # Dodanie przezroczystości
+        add_button.setStyleSheet(button_style + "background-color: rgba(0, 0, 255, 0.5);")  
         edit_button.setStyleSheet(button_style + "background-color: rgba(0, 0, 255, 0.5);")
         delete_button.setStyleSheet(button_style + "background-color: rgba(0, 0, 255, 0.5);")
         
@@ -183,9 +188,15 @@ class CentralWindowMain(QtWidgets.QDialog):
       
     def clients(self):
         pass
+    
+    def on_button_clicked_complain(self):
+        if self.sender().text() == 'Reklamacje':
+            self.complain_goods()
       
     def complain_goods(self):
-        pass
+        reklamacje_window = KlientWindow(self)
+        reklamacje_window.exec_()
+           
     
     def reports_stats(self):
         pass
@@ -220,6 +231,7 @@ if __name__ == '__main__':
     window = CentralWindowMain()
     window.show()
     sys.exit(app.exec_())
+
 
 
 
