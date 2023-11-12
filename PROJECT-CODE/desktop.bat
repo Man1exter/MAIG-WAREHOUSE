@@ -1,2 +1,2 @@
 @echo off
-start python "C:\Users\mperz\Desktop\MAIG WAREHOUSE\PROJECT-CODE\main.py"
+start python -W hide "C:\Users\mperz\Desktop\MAIG WAREHOUSE\PROJECT-CODE\main.py"
