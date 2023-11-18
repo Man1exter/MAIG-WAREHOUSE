@@ -2,8 +2,7 @@ import sys
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QVBoxLayout, QPushButton, QDialog, QFormLayout, QLabel, QLineEdit, QTextEdit, QListWidget, QListWidgetItem, QWidget, QDesktopWidget, QMessageBox, QInputDialog
 )
-from PyQt5.QtGui import QPixmap, QFont
-from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
 
 class CompanyClient:
     def __init__(self, pelna_nazwa, skrocona_nazwa, nip, kod_pocztowy, ulica, wlasciciel, telefon, email, informacje):
@@ -20,6 +19,8 @@ class CompanyClient:
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        
+        self.setStyleSheet("QMainWindow {background-image: url(C:/Users/mperz/Desktop/MAIG WAREHOUSE/JPEGEIMAGE/New-World-niszczy-GPU.jpg);}")
 
         self.setWindowTitle("Aplikacja Klientów")
 
@@ -27,7 +28,7 @@ class MainWindow(QMainWindow):
         button_zapisz.setStyleSheet("font-size: 20px; background-color: #2ecc71; color: white; padding: 10px 20px;")
         button_zapisz.clicked.connect(self.show_zapisz_klienta)
 
-        button_klienci = QPushButton("Aktualni klienci", self)
+        button_klienci = QPushButton("Klienci", self)
         button_klienci.setStyleSheet("font-size: 20px; background-color: #3498db; color: white; padding: 10px 20px;")
         button_klienci.clicked.connect(self.show_klienci_zapisani)
 
@@ -38,6 +39,23 @@ class MainWindow(QMainWindow):
         central_widget = QWidget(self)
         central_widget.setLayout(self.layout)
         self.setCentralWidget(central_widget)
+
+        # Set window size and center on screen
+        self.resize(600, 400)  # Set the desired size
+        self.center_on_screen()
+
+    def center_on_screen(self):
+        # Get the geometry of the main screen
+        screen_geometry = QDesktopWidget().availableGeometry()
+
+        # Get the size and position of the main window
+        window_geometry = self.frameGeometry()
+
+        # Center the window on the screen
+        window_geometry.moveCenter(screen_geometry.center())
+
+        # Set the new position of the window
+        self.move(window_geometry.topLeft())
 
     def show_zapisz_klienta(self):
         zapisz_okno = ZapiszKlientaWindow(self)
@@ -50,6 +68,8 @@ class MainWindow(QMainWindow):
 class ZapiszKlientaWindow(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
+        
+        self.setStyleSheet("QMainWindow {background-image: url(C:/Users/mperz/Desktop/MAIG WAREHOUSE/JPEGEIMAGE/New-World-niszczy-GPU.jpg);}")
 
         self.setWindowTitle("Zapisz Klienta")
         self.klienci = []
@@ -236,6 +256,7 @@ if __name__ == "__main__":
     main_window = MainWindow()
     main_window.show()
     sys.exit(app.exec_())
+
 
 
 
