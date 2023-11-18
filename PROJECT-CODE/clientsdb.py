@@ -1,5 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QLabel, QLineEdit, QPushButton, QTextEdit, QListWidget, QListWidgetItem, QMessageBox, QFormLayout
+from PyQt5.QtWidgets import (
+    QApplication, QMainWindow, QVBoxLayout, QPushButton, QTextEdit, QListWidget, QListWidgetItem, QLabel, QLineEdit, QFormLayout, QMessageBox, QWidget
+)
 from PyQt5.QtGui import QColor, QPixmap, QFont
 from PyQt5.QtCore import Qt
 
@@ -33,39 +35,17 @@ class ClientInfoWindow(QMainWindow):
 
         self.form_layout = QFormLayout()
 
-        self.edit_pelna_nazwa = QLineEdit(self)
-        self.edit_pelna_nazwa.setFont(QFont("Arial", 12, QFont.Bold))
-        self.form_layout.addRow(QLabel("<font size='4'>Pełna Nazwa Firmy:</font>"), self.edit_pelna_nazwa)
-
-        self.edit_skrocona_nazwa = QLineEdit(self)
-        self.edit_skrocona_nazwa.setFont(QFont("Arial", 12, QFont.Bold))
-        self.form_layout.addRow(QLabel("<font size='4'>Skrócona Nazwa Firmy:</font>"), self.edit_skrocona_nazwa)
-
-        self.edit_nip = QLineEdit(self)
-        self.edit_nip.setFont(QFont("Arial", 12, QFont.Bold))
-        self.form_layout.addRow(QLabel("<font size='4'>NIP:</font>"), self.edit_nip)
-
-        self.edit_kod_pocztowy = QLineEdit(self)
-        self.edit_kod_pocztowy.setFont(QFont("Arial", 12, QFont.Bold))
-        self.form_layout.addRow(QLabel("<font size='4'>Kod Pocztowy:</font>"), self.edit_kod_pocztowy)
-
-        self.edit_ulica = QLineEdit(self)
-        self.edit_ulica.setFont(QFont("Arial", 12, QFont.Bold))
-        self.form_layout.addRow(QLabel("<font size='4'>Ulica:</font>"), self.edit_ulica)
-
-        self.edit_wlasciciel = QLineEdit(self)
-        self.edit_wlasciciel.setFont(QFont("Arial", 12, QFont.Bold))
-        self.form_layout.addRow(QLabel("<font size='4'>Właściciel:</font>"), self.edit_wlasciciel)
-
-        self.edit_telefon = QLineEdit(self)
-        self.edit_telefon.setFont(QFont("Arial", 12, QFont.Bold))
-        self.form_layout.addRow(QLabel("<font size='4'>Telefon:</font>"), self.edit_telefon)
-
-        self.edit_email = QLineEdit(self)
-        self.edit_email.setFont(QFont("Arial", 12, QFont.Bold))
-        self.form_layout.addRow(QLabel("<font size='4'>Email:</font>"), self.edit_email)
+        self.create_input_field(self.form_layout, "Pełna Nazwa Firmy:", "edit_pelna_nazwa")
+        self.create_input_field(self.form_layout, "Skrócona Nazwa Firmy:", "edit_skrocona_nazwa")
+        self.create_input_field(self.form_layout, "NIP:", "edit_nip")
+        self.create_input_field(self.form_layout, "Kod Pocztowy:", "edit_kod_pocztowy")
+        self.create_input_field(self.form_layout, "Ulica:", "edit_ulica")
+        self.create_input_field(self.form_layout, "Właściciel:", "edit_wlasciciel")
+        self.create_input_field(self.form_layout, "Telefon:", "edit_telefon")
+        self.create_input_field(self.form_layout, "Email:", "edit_email")
 
         self.edit_informacje = QTextEdit(self)
+        self.edit_informacje.setStyleSheet("font-size: 12px; color: red;")
         self.form_layout.addRow(QLabel("<font size='4'>Dodatkowe informacje:</font>"), self.edit_informacje)
 
         self.layout.addLayout(self.form_layout)
@@ -98,6 +78,14 @@ class ClientInfoWindow(QMainWindow):
 
         self.lista_klientow.itemClicked.connect(self.pokaz_informacje)
 
+    def create_input_field(self, layout, label_text, widget_name):
+        label = QLabel(f"<font size='4'>{label_text}</font>", self)
+        label.setStyleSheet("font-weight: bold; color: red;")
+        edit = QLineEdit(self)
+        edit.setFont(QFont("Arial", 12, QFont.Bold))
+        setattr(self, widget_name, edit)
+        layout.addRow(label, edit)
+
     def zapisz_klienta(self):
         pelna_nazwa = self.edit_pelna_nazwa.text()
         skrocona_nazwa = self.edit_skrocona_nazwa.text()
@@ -123,14 +111,8 @@ class ClientInfoWindow(QMainWindow):
             self.lista_klientow.takeItem(index)
 
     def wyczysc_pola(self):
-        self.edit_pelna_nazwa.clear()
-        self.edit_skrocona_nazwa.clear()
-        self.edit_nip.clear()
-        self.edit_kod_pocztowy.clear()
-        self.edit_ulica.clear()
-        self.edit_wlasciciel.clear()
-        self.edit_telefon.clear()
-        self.edit_email.clear()
+        for field in ["pelna_nazwa", "skrocona_nazwa", "nip", "kod_pocztowy", "ulica", "wlasciciel", "telefon", "email"]:
+            getattr(self, f"edit_{field}").clear()
         self.edit_informacje.clear()
 
     def pokaz_informacje(self, item):
@@ -145,6 +127,7 @@ if __name__ == "__main__":
     window = ClientInfoWindow()
     window.showMaximized()
     sys.exit(app.exec_())
+
 
 
 
