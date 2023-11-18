@@ -44,9 +44,11 @@ class ClientInfoWindow(QMainWindow):
         self.create_input_field(self.form_layout, "Telefon:", "edit_telefon")
         self.create_input_field(self.form_layout, "Email:", "edit_email")
 
+        label_informacje = QLabel("<font size='4'><b>Dodatkowe informacje:</b></font>", self)
+        label_informacje.setStyleSheet("font-weight: bold; color: red;")
         self.edit_informacje = QTextEdit(self)
         self.edit_informacje.setStyleSheet("font-size: 12px; color: red;")
-        self.form_layout.addRow(QLabel("<font size='4'>Dodatkowe informacje:</font>"), self.edit_informacje)
+        self.form_layout.addRow(label_informacje, self.edit_informacje)
 
         self.layout.addLayout(self.form_layout)
 
@@ -97,12 +99,18 @@ class ClientInfoWindow(QMainWindow):
         email = self.edit_email.text()
         informacje = self.edit_informacje.toPlainText()
 
+        if not any([pelna_nazwa, skrocona_nazwa, nip, kod_pocztowy, ulica, wlasciciel, telefon, email, informacje]):
+            QMessageBox.warning(self, "Błąd", "Nie można dodać pustego klienta.")
+            return
+
         klient = CompanyClient(pelna_nazwa, skrocona_nazwa, nip, kod_pocztowy, ulica, wlasciciel, telefon, email, informacje)
         self.klienci.append(klient)
 
         item = QListWidgetItem(pelna_nazwa, self.lista_klientow)
         item.setData(1, len(self.klienci) - 1)
-        item.setBackground(QColor("#2c3e50")) 
+        item.setBackground(QColor("#2c3e50"))
+
+        self.wyczysc_pola()
 
     def usun_klienta(self):
         index = self.lista_klientow.currentRow()
