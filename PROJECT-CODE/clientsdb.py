@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QVBoxLayout, QPushButton, QTextEdit, QListWidget, QListWidgetItem, QLabel, QLineEdit, QFormLayout, QMessageBox, QWidget
+    QApplication, QMainWindow, QVBoxLayout, QPushButton, QTextEdit, QListWidget, QListWidgetItem, QLabel, QLineEdit, QFormLayout, QMessageBox, QWidget, QHBoxLayout
 )
 from PyQt5.QtGui import QColor, QPixmap, QFont
 from PyQt5.QtCore import Qt
@@ -68,6 +68,17 @@ class ClientInfoWindow(QMainWindow):
         self.layout.addWidget(self.button_usun)
         self.layout.addWidget(self.button_wyczysc)
 
+        # Dodaj pole do wprowadzenia nazwy klienta do wyszukania
+        self.edit_szukaj_nazwa = QLineEdit(self)
+        self.edit_szukaj_nazwa.setPlaceholderText("Wyszukaj klienta po nazwie...")
+        self.layout.addWidget(self.edit_szukaj_nazwa)
+
+        # Przycisk do rozpoczęcia wyszukiwania
+        self.button_szukaj = QPushButton("Szukaj", self)
+        self.button_szukaj.setStyleSheet("font-size: 16px; background-color: #3498db; color: white; padding: 8px 16px;")
+        self.button_szukaj.clicked.connect(self.szukaj_klienta)
+        self.layout.addWidget(self.button_szukaj)
+
         self.lista_klientow = QListWidget(self)
         self.lista_klientow.setStyleSheet("font-size: 18px; color: white; background-color: #34495e;")  
         self.layout.addWidget(self.lista_klientow)
@@ -130,11 +141,22 @@ class ClientInfoWindow(QMainWindow):
             informacje = f"<b>NIP:</b> {klient.nip}<br><br><b>Kod Pocztowy:</b> {klient.kod_pocztowy}<br><br><b>Ulica:</b> {klient.ulica}<br><br><b>Właściciel:</b> {klient.wlasciciel}<br><br><b>Telefon:</b> {klient.telefon}<br><br><b>Email:</b> {klient.email}<br><br>{str(klient.informacje)}"
             QMessageBox.information(self, klient.pelna_nazwa, informacje)
 
+    def szukaj_klienta(self):
+        nazwa_szukana = self.edit_szukaj_nazwa.text()
+        if nazwa_szukana:
+            znalezione_klienci = [klient for klient in self.klienci if nazwa_szukana.lower() in klient.pelna_nazwa.lower()]
+            self.lista_klientow.clear()
+            for klient in znalezione_klienci:
+                item = QListWidgetItem(klient.pelna_nazwa, self.lista_klientow)
+                item.setData(1, self.klienci.index(klient))
+                item.setBackground(QColor("#2c3e50"))
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = ClientInfoWindow()
     window.showMaximized()
     sys.exit(app.exec_())
+
 
 
 
