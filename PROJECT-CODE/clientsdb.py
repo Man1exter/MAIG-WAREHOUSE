@@ -1,9 +1,9 @@
 import sys
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QVBoxLayout, QPushButton, QDialog, QFormLayout, QLabel, QLineEdit, QTextEdit, QListWidget, QListWidgetItem, QWidget, QMessageBox
+    QApplication, QMainWindow, QVBoxLayout, QPushButton, QDialog, QFormLayout, QLabel, QLineEdit, QTextEdit, QListWidget, QListWidgetItem, QWidget, QDesktopWidget, QMessageBox, QInputDialog
 )
-from PyQt5.QtGui import QPixmap, QFont, QDesktopServices
-from PyQt5.QtCore import Qt, QUrl
+from PyQt5.QtGui import QPixmap, QFont
+from PyQt5.QtCore import Qt
 
 class CompanyClient:
     def __init__(self, pelna_nazwa, skrocona_nazwa, nip, kod_pocztowy, ulica, wlasciciel, telefon, email, informacje):
@@ -23,11 +23,11 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("Aplikacja Klientów")
 
-        button_zapisz = QPushButton("Zapisz Klienta", self)
+        button_zapisz = QPushButton("Zapisz nowego klienta", self)
         button_zapisz.setStyleSheet("font-size: 20px; background-color: #2ecc71; color: white; padding: 10px 20px;")
         button_zapisz.clicked.connect(self.show_zapisz_klienta)
 
-        button_klienci = QPushButton("Klienci Już Zapisani", self)
+        button_klienci = QPushButton("Aktualni klienci", self)
         button_klienci.setStyleSheet("font-size: 20px; background-color: #3498db; color: white; padding: 10px 20px;")
         button_klienci.clicked.connect(self.show_klienci_zapisani)
 
@@ -39,16 +39,6 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(self.layout)
         self.setCentralWidget(central_widget)
 
-        self.background_image_path_main = r"C:\Users\mperz\Desktop\MAIG WAREHOUSE\JPEGEIMAGE\New-World-niszczy-GPU.jpg"
-        background_image_main = QPixmap(self.background_image_path_main)
-        background_label_main = QLabel(self)
-        background_label_main.setPixmap(background_image_main)
-        self.setFixedSize(background_image_main.width(), background_image_main.height())
-        self.layout.addWidget(background_label_main)
-
-        # Wyśrodkowanie przycisków
-        self.center_buttons()
-
     def show_zapisz_klienta(self):
         zapisz_okno = ZapiszKlientaWindow(self)
         zapisz_okno.exec_()
@@ -57,30 +47,12 @@ class MainWindow(QMainWindow):
         klienci_okno = KlienciZapisaniWindow(self)
         klienci_okno.exec_()
 
-    def center_buttons(self):
-        desktop_geometry = QDesktopServices().availableGeometry()
-        button_zapisz = self.layout.itemAt(0).widget()
-        button_klienci = self.layout.itemAt(1).widget()
-
-        # Obliczanie pozycji, aby umieścić przyciski na środku okna
-        x_zapisz = (desktop_geometry.width() - button_zapisz.width()) // 2
-        x_klienci = (desktop_geometry.width() - button_klienci.width()) // 2
-
-        button_zapisz.move(x_zapisz, button_zapisz.y())
-        button_klienci.move(x_klienci, button_klienci.y())
-
 class ZapiszKlientaWindow(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
         self.setWindowTitle("Zapisz Klienta")
         self.klienci = []
-
-        self.background_image_path = r"C:\Users\mperz\Desktop\MAIG WAREHOUSE\JPEGEIMAGE\New-World-niszczy-GPU.jpg"
-        background_image = QPixmap(self.background_image_path)
-        background_label = QLabel(self)
-        background_label.setPixmap(background_image)
-        self.setFixedSize(background_image.width(), background_image.height())
 
         self.form_layout = QFormLayout()
 
@@ -146,11 +118,7 @@ class KlienciZapisaniWindow(QDialog):
 
         self.setWindowTitle("Klienci Już Zapisani")
 
-        self.background_image_path = r"C:\Users\mperz\Desktop\MAIG WAREHOUSE\JPEGEIMAGE\New-World-niszczy-GPU.jpg"
-        background_image = QPixmap(self.background_image_path)
-        background_label = QLabel(self)
-        background_label.setPixmap(background_image)
-        self.setFixedSize(background_image.width(), background_image.height())
+        self.klienci = []
 
         self.layout = QVBoxLayout()
 
@@ -163,9 +131,18 @@ class KlienciZapisaniWindow(QDialog):
         self.button_usun.clicked.connect(self.usun_klienta)
         self.layout.addWidget(self.button_usun)
 
+        self.button_edytuj = QPushButton("Edytuj", self)
+        self.button_edytuj.setStyleSheet("font-size: 20px; background-color: #f39c12; color: white; padding: 10px 20px;")
+        self.button_edytuj.clicked.connect(self.edytuj_klienta)
+        self.layout.addWidget(self.button_edytuj)
+
+        self.button_wyszukaj = QPushButton("Wyszukaj", self)
+        self.button_wyszukaj.setStyleSheet("font-size: 20px; background-color: #3498db; color: white; padding: 10px 20px;")
+        self.button_wyszukaj.clicked.connect(self.wyszukaj_klienta)
+        self.layout.addWidget(self.button_wyszukaj)
+
         self.setLayout(self.layout)
 
-        self.klienci = []
         self.lista_klientow.itemClicked.connect(self.pokaz_informacje)
 
     def usun_klienta(self):
@@ -174,6 +151,23 @@ class KlienciZapisaniWindow(QDialog):
             del self.klienci[index]
             self.lista_klientow.takeItem(index)
 
+    def edytuj_klienta(self):
+        index = self.lista_klientow.currentRow()
+        if index != -1:
+            edytuj_okno = EdytujKlientaWindow(self, self.klienci[index])
+            edytuj_okno.exec_()
+
+    def wyszukaj_klienta(self):
+        search_text, ok = QInputDialog.getText(self, 'Wyszukaj Klienta', 'Podaj nazwę klienta:')
+        if ok and search_text:
+            found_items = [item for item in self.klienci if search_text.lower() in item.pelna_nazwa.lower()]
+            self.update_list(found_items)
+
+    def update_list(self, items):
+        self.lista_klientow.clear()
+        for item in items:
+            self.lista_klientow.addItem(QListWidgetItem(item.pelna_nazwa))
+
     def pokaz_informacje(self, item):
         index = item.data(1)
         if index is not None:
@@ -181,11 +175,72 @@ class KlienciZapisaniWindow(QDialog):
             informacje = f"<b>NIP:</b> {klient.nip}<br><br><b>Kod Pocztowy:</b> {klient.kod_pocztowy}<br><br><b>Ulica:</b> {klient.ulica}<br><br><b>Właściciel:</b> {klient.wlasciciel}<br><br><b>Telefon:</b> {klient.telefon}<br><br><b>Email:</b> {klient.email}<br><br>{str(klient.informacje)}"
             QMessageBox.information(self, klient.pelna_nazwa, informacje)
 
+class EdytujKlientaWindow(QDialog):
+    def __init__(self, parent=None, klient=None):
+        super().__init__(parent)
+
+        self.setWindowTitle("Edytuj Klienta")
+        self.klienci = parent.klienci
+        self.edytowany_klient = klient
+
+        self.form_layout = QFormLayout()
+
+        self.create_input_field(self.form_layout, "Pełna Nazwa Firmy:", "edit_pelna_nazwa", self.edytowany_klient.pelna_nazwa)
+        self.create_input_field(self.form_layout, "Skrócona Nazwa Firmy:", "edit_skrocona_nazwa", self.edytowany_klient.skrocona_nazwa)
+        self.create_input_field(self.form_layout, "NIP:", "edit_nip", self.edytowany_klient.nip)
+        self.create_input_field(self.form_layout, "Kod Pocztowy:", "edit_kod_pocztowy", self.edytowany_klient.kod_pocztowy)
+        self.create_input_field(self.form_layout, "Ulica:", "edit_ulica", self.edytowany_klient.ulica)
+        self.create_input_field(self.form_layout, "Właściciel:", "edit_wlasciciel", self.edytowany_klient.wlasciciel)
+        self.create_input_field(self.form_layout, "Telefon:", "edit_telefon", self.edytowany_klient.telefon)
+        self.create_input_field(self.form_layout, "Email:", "edit_email", self.edytowany_klient.email)
+
+        self.edit_informacje = QTextEdit(self)
+        self.edit_informacje.setStyleSheet("font-size: 12px; color: red;")
+        self.edit_informacje.setPlainText(str(self.edytowany_klient.informacje))
+        self.form_layout.addRow(QLabel("<font size='4'><b>Dodatkowe informacje:</b></font>"), self.edit_informacje)
+
+        self.layout = QVBoxLayout()
+        self.layout.addLayout(self.form_layout)
+
+        self.button_zapisz = QPushButton("Zapisz zmiany", self)
+        self.button_zapisz.setStyleSheet("font-size: 20px; background-color: #2ecc71; color: white; padding: 10px 20px;")
+        self.button_zapisz.clicked.connect(self.zapisz_edycje)
+        self.layout.addWidget(self.button_zapisz)
+
+        self.setLayout(self.layout)
+
+    def create_input_field(self, layout, label_text, widget_name, default_value=""):
+        label = QLabel(f"<font size='4'>{label_text}</font>", self)
+        label.setStyleSheet("font-weight: bold; color: red;")
+        edit = QLineEdit(self)
+        edit.setFont(QFont("Arial", 12, QFont.Bold))
+        edit.setText(default_value)
+        setattr(self, widget_name, edit)
+        layout.addRow(label, edit)
+
+    def zapisz_edycje(self):
+        self.edytowany_klient.pelna_nazwa = self.edit_pelna_nazwa.text()
+        self.edytowany_klient.skrocona_nazwa = self.edit_skrocona_nazwa.text()
+        self.edytowany_klient.nip = self.edit_nip.text()
+        self.edytowany_klient.kod_pocztowy = self.edit_kod_pocztowy.text()
+        self.edytowany_klient.ulica = self.edit_ulica.text()
+        self.edytowany_klient.wlasciciel = self.edit_wlasciciel.text()
+        self.edytowany_klient.telefon = self.edit_telefon.text()
+        self.edytowany_klient.email = self.edit_email.text()
+        self.edytowany_klient.informacje = self.edit_informacje.toPlainText()
+
+        self.accept()
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     main_window = MainWindow()
     main_window.show()
     sys.exit(app.exec_())
+
+
+
+
+
 
 
 
