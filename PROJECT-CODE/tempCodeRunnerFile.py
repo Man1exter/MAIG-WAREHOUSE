@@ -1,1 +1,1 @@
-C:\Users\mperz\Desktop\MAIG WAREHOUSE\JPEGEIMAGE\New-World-niszczy-GPU.jpg
+on_sett_butto

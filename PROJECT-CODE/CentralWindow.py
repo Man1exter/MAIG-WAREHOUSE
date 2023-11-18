@@ -4,6 +4,7 @@ from helpBarSection import HelpWindow
 from settoptionspy import OknoUstawien
 from seasonoftrends import TrendSeasonalityWindow
 from complains import KlientWindow
+from clientsdb import MainWindowcl
 import sys
 import subprocess
 
@@ -52,6 +53,9 @@ class CentralWindowMain(QtWidgets.QDialog):
             
             elif label == 'Reklamacje':
                 button.clicked.connect(self.complain_goods)
+                
+            elif label == 'Klienci':
+                button.clicked.connect(self.clients_pow)
                 
         
         help_button = QtWidgets.QPushButton('Pomoc')
@@ -185,9 +189,16 @@ class CentralWindowMain(QtWidgets.QDialog):
       
     def goods_review(self):
         pass
-      
-    def clients(self):
-        pass
+    
+    
+    def on_button_clients(self):
+        if self.sender().text() == 'Klienci':
+            self.clients_pow()
+    
+    def clients_pow(self):
+        klienci_window = MainWindowcl(self)
+        klienci_window.exec_()
+    
     
     def on_button_clicked_complain(self):
         if self.sender().text() == 'Reklamacje':

@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QVBoxLayout, QPushButton, QDialog, QFormLayout, QLabel, QLineEdit, QTextEdit, QListWidget, QListWidgetItem, QWidget, QDesktopWidget, QMessageBox, QInputDialog
 )
 from PyQt5.QtGui import QPixmap, QFont
+from PyQt5 import QtWidgets
 
 class CompanyClient:
     def __init__(self, pelna_nazwa, skrocona_nazwa, nip, kod_pocztowy, ulica, wlasciciel, telefon, email, informacje):
@@ -16,9 +17,9 @@ class CompanyClient:
         self.email = email
         self.informacje = informacje
 
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
+class MainWindowcl(QtWidgets.QMainWindow):
+    def __init__(self, parent=None):
+        super(MainWindowcl, self).__init__(parent)
 
         self.setStyleSheet("QMainWindow {background-image: url(C:/Users/mperz/Desktop/MAIG WAREHOUSE/JPEGEIMAGE/New-World-niszczy-GPU.jpg);}")
 
@@ -44,7 +45,6 @@ class MainWindow(QMainWindow):
         self.resize(600, 400)  
         self.center_on_screen()
 
-        # List to store clients
         self.klienci = []
 
     def center_on_screen(self):
@@ -72,6 +72,8 @@ class ZapiszKlientaWindow(QDialog):
 
         self.setWindowTitle("Zapisz Klienta")
         self.klienci = parent.klienci  
+        
+        self.setFixedSize(800, 800)
 
         self.form_layout = QFormLayout()
 
@@ -133,6 +135,8 @@ class KlienciZapisaniWindow(QDialog):
         self.setWindowTitle("Klienci Już Zapisani")
 
         self.klienci = parent.klienci 
+        
+        self.setFixedSize(800, 800)
 
         self.layout = QVBoxLayout()
 
@@ -325,7 +329,7 @@ class EdytujKlientaWindow(QDialog):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    main_window = MainWindow()
+    main_window = MainWindowcl()
     main_window.show()
     sys.exit(app.exec_())
 
