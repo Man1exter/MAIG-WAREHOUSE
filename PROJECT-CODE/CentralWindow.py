@@ -197,7 +197,7 @@ class CentralWindowMain(QtWidgets.QDialog):
     
     def clients_pow(self):
         klienci_window = MainWindowcl(self)
-        klienci_window.exec_()
+        klienci_window.show()
     
     
     def on_button_clicked_complain(self):
