@@ -199,9 +199,7 @@ class CentralWindowMain(QtWidgets.QDialog):
             self.goods_review()
       
     def goods_review(self):
-        # Sprawdź, czy okno już istnieje
         if not self.revgood_window or not self.revgood_window.isVisible():
-            # Utwórz okno tylko wtedy, gdy nie istnieje lub jest ukryte
             self.revgood_window = WarehouseWindow()
             self.revgood_window.show()
     
