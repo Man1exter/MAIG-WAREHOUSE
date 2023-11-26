@@ -1,10 +1,10 @@
 import sys
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QVBoxLayout, QWidget, QGridLayout,
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QFormLayout,
     QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem,
-    QFormLayout, QDialog, QMessageBox
+    QGroupBox, QStackedWidget, QHBoxLayout, QDesktopWidget, QMessageBox
 )
-from PyQt5.QtGui import QPixmap, QColor, QPalette, QFont
+from PyQt5.QtGui import QPixmap, QPalette, QColor
 from PyQt5.QtCore import Qt
 
 class Product:
@@ -25,64 +25,121 @@ class WarehouseWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Towary w Magazynie")
-        self.setGeometry(100, 100, 800, 600)  # Ustaw rozmiar okna na przykład 800x600
 
-        # Ustaw tło okna
-        self.setStyleSheet("background-color: #2c3e50;")  # Kolor tła
-        self.central_widget = QWidget(self)
-        self.setCentralWidget(self.central_widget)
+        # Ustawienie tła
+        palette = QPalette()
+        palette.setColor(QPalette.Window, QColor(240, 240, 240))
+        self.setPalette(palette)
 
-        self.layout = QGridLayout(self.central_widget)
+        # Główny widget
+        main_widget = QWidget(self)
+        self.setCentralWidget(main_widget)
 
-        # Tabela
+        # Układ główny
+        main_layout = QHBoxLayout(main_widget)
+
+        # Grupa dla tabeli
+        table_group = QGroupBox("Tabela")
+        table_layout = QVBoxLayout(table_group)
+
         self.table = QTableWidget(self)
-        self.table.setColumnCount(7)
-        self.table.setHorizontalHeaderLabels(["EAN", "Nazwa", "Opis", "Cena Netto", "VAT", "Cena Brutto", "Ilość"])
-        self.table.setStyleSheet("background-color: #ecf0f1; color: #333333; font-size: 14px;")
-        self.layout.addWidget(self.table, 0, 0, 1, 3)
+        self.table.setColumnCount(8)
+        self.table.setHorizontalHeaderLabels(["EAN", "Nazwa", "Opis", "Cena Netto", "VAT", "Cena Brutto", "Ilość", ""])
+        table_layout.addWidget(self.table)
 
-        # Formularz dodawania/edycji produktu
-        self.form_layout = QFormLayout()
+        main_layout.addWidget(table_group)
+
+        # Grupa dla formularza
+        form_group = QGroupBox("Formularz")
+        form_layout = QFormLayout(form_group)
+
         self.ean_edit = QLineEdit(self)
-        self.form_layout.addRow("EAN:", self.ean_edit)
-        self.name_edit = QLineEdit(self)
-        self.form_layout.addRow("Nazwa:", self.name_edit)
-        self.description_edit = QLineEdit(self)
-        self.form_layout.addRow("Opis:", self.description_edit)
-        self.net_price_edit = QLineEdit(self)
-        self.form_layout.addRow("Cena Netto:", self.net_price_edit)
-        self.vat_rate_edit = QLineEdit(self)
-        self.form_layout.addRow("VAT (%):", self.vat_rate_edit)
-        self.gross_price_label = QLabel(self)
-        self.form_layout.addRow("Cena Brutto:", self.gross_price_label)
-        self.quantity_edit = QLineEdit(self)
-        self.form_layout.addRow("Ilość:", self.quantity_edit)
+        form_layout.addRow("EAN:", self.ean_edit)
 
-        self.layout.addLayout(self.form_layout, 1, 0, 1, 2)
+        self.name_edit = QLineEdit(self)
+        form_layout.addRow("Nazwa:", self.name_edit)
+
+        self.description_edit = QLineEdit(self)
+        form_layout.addRow("Opis:", self.description_edit)
+
+        self.net_price_edit = QLineEdit(self)
+        form_layout.addRow("Cena Netto:", self.net_price_edit)
+
+        self.vat_rate_edit = QLineEdit(self)
+        form_layout.addRow("VAT (%):", self.vat_rate_edit)
+
+        self.gross_price_label = QLabel(self)
+        form_layout.addRow("Cena Brutto:", self.gross_price_label)
+
+        self.quantity_edit = QLineEdit(self)
+        form_layout.addRow("Ilość:", self.quantity_edit)
+
+        main_layout.addWidget(form_group)
 
         # Przyciski
+        button_layout = QVBoxLayout()
+
         self.add_button = QPushButton("Dodaj", self)
         self.add_button.clicked.connect(self.add_product)
-        self.layout.addWidget(self.add_button, 2, 0)
+        button_layout.addWidget(self.add_button)
 
         self.edit_button = QPushButton("Edytuj", self)
         self.edit_button.clicked.connect(self.edit_product)
-        self.layout.addWidget(self.edit_button, 2, 1)
+        button_layout.addWidget(self.edit_button)
 
         self.remove_button = QPushButton("Usuń", self)
         self.remove_button.clicked.connect(self.remove_product)
-        self.layout.addWidget(self.remove_button, 2, 2)
+        button_layout.addWidget(self.remove_button)
+
+        main_layout.addLayout(button_layout)
 
         # Inne ustawienia
-        self.selected_row = -1  # Numer zaznaczonego wiersza w tabeli
+        self.selected_row = -1
         self.setup_styles()
+
+        # Ustawienie rozmiarów okna na całą dostępną przestrzeń ekranu
+        screen_geometry = QDesktopWidget().availableGeometry()
+        self.setGeometry(screen_geometry)
+        self.showMaximized()
 
     def setup_styles(self):
         # Stylizacja elementów
-        self.setStyleSheet("QLabel { color: black; font-size: 14px; font-weight: bold; }"
-                           "QLineEdit { background-color: #ffffff; color: #333333; font-size: 14px; }"
-                           "QTableWidget { background-color: #ffffff; color: #333333; font-size: 14px; }"
-                           "QPushButton { background-color: #3498db; color: white; font-size: 14px; }")
+        self.setStyleSheet("""
+            QGroupBox {
+                font-size: 18px;
+                border: 2px solid #3498db;
+                border-radius: 8px;
+                margin-top: 10px;
+                background-color: white;
+            }
+
+            QLabel {
+                font-size: 14px;
+                font-weight: bold;
+            }
+
+            QLineEdit {
+                font-size: 14px;
+                padding: 6px;
+            }
+
+            QTableWidget {
+                background-color: white;
+                color: #333333;
+                font-size: 14px;
+                border: 2px solid #3498db;
+                border-radius: 8px;
+            }
+
+            QPushButton {
+                background-color: #3498db;
+                color: white;
+                font-size: 14px;
+                border: 2px solid #3498db;
+                border-radius: 8px;
+                padding: 8px;
+            }
+        """)
 
     def clear_form(self):
         self.ean_edit.clear()
@@ -117,7 +174,6 @@ class WarehouseWindow(QMainWindow):
 
             product = Product(ean, name, description, net_price, vat_rate, quantity)
 
-            # Dodaj produkt do tabeli
             row_position = self.table.rowCount()
             self.table.insertRow(row_position)
             self.table.setItem(row_position, 0, QTableWidgetItem(product.ean))
@@ -127,6 +183,11 @@ class WarehouseWindow(QMainWindow):
             self.table.setItem(row_position, 4, QTableWidgetItem(f"{product.vat_rate:.2f}"))
             self.table.setItem(row_position, 5, QTableWidgetItem(f"{product.gross_price:.2f}"))
             self.table.setItem(row_position, 6, QTableWidgetItem(str(product.quantity)))
+
+            remove_button = QPushButton("Usuń", self)
+            remove_button.clicked.connect(lambda _, row=row_position: self.remove_product_row(row))
+            remove_button.setStyleSheet("background-color: #e74c3c; color: white; font-size: 14px; border: 2px solid #e74c3c; border-radius: 8px; padding: 8px;")
+            self.table.setCellWidget(row_position, 7, remove_button)
 
             self.clear_form()
 
@@ -152,7 +213,6 @@ class WarehouseWindow(QMainWindow):
 
             product = Product(ean, name, description, net_price, vat_rate, quantity)
 
-            # Edytuj zaznaczony wiersz
             self.table.setItem(self.selected_row, 0, QTableWidgetItem(product.ean))
             self.table.setItem(self.selected_row, 1, QTableWidgetItem(product.name))
             self.table.setItem(self.selected_row, 2, QTableWidgetItem(product.description))
@@ -174,11 +234,20 @@ class WarehouseWindow(QMainWindow):
         self.table.removeRow(self.selected_row)
         self.clear_form()
 
+    def remove_product_row(self, row):
+        self.table.removeRow(row)
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = WarehouseWindow()
     window.show()
     sys.exit(app.exec_())
+
+
+
+
+
+
 
 
 
