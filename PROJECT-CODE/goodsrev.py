@@ -2,10 +2,9 @@ import sys
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QFormLayout,
     QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem,
-    QGroupBox, QStackedWidget, QHBoxLayout, QDesktopWidget, QMessageBox,
-    QVBoxLayout, QSpacerItem, QSizePolicy
+    QGroupBox, QHeaderView, QDesktopWidget, QMessageBox
 )
-from PyQt5.QtGui import QPixmap, QPalette, QColor
+from PyQt5.QtGui import QPalette, QColor, QFont
 from PyQt5.QtCore import Qt
 
 class Product:
@@ -34,7 +33,7 @@ class WarehouseWindow(QMainWindow):
         self.setCentralWidget(main_widget)
 
         # Układ główny
-        main_layout = QHBoxLayout(main_widget)
+        main_layout = QVBoxLayout(main_widget)
 
         # Grupa dla tabeli
         table_group = QGroupBox()
@@ -44,6 +43,21 @@ class WarehouseWindow(QMainWindow):
         self.table.setColumnCount(9)
         self.table.setHorizontalHeaderLabels(["EAN", "Nazwa", "Opis", "Cena Netto", "VAT", "Cena Brutto", "Ilość", "", ""])
         table_layout.addWidget(self.table)
+
+        # Stylizacja nagłówków tabeli
+        header = self.table.horizontalHeader()
+        for i in range(self.table.columnCount()):
+            header.setSectionResizeMode(i, QHeaderView.Fixed)
+            header.resizeSection(i, 150)  # Ustawiona szerokość kolumny
+
+        # Pogrubienie i zmiana koloru nagłówków tabeli
+        header_font = QFont()
+        header_font.setBold(True)
+        header_font.setPointSize(14)
+        header.setStyleSheet("font-size: 14px; background-color: #3498db; color: white;")
+        header.setDefaultAlignment(Qt.AlignCenter)
+        for i in range(self.table.columnCount()):
+            header.setFont(header_font)
 
         main_layout.addWidget(table_group)
 
@@ -66,12 +80,14 @@ class WarehouseWindow(QMainWindow):
         form_layout.addRow("Opis:", self.description_edit)
 
         self.net_price_edit = QLineEdit(self)
+        self.net_price_edit.textChanged.connect(self.update_gross_price_edit)
         form_layout.addRow("Cena Netto:", self.net_price_edit)
 
         self.vat_rate_edit = QLineEdit(self)
         form_layout.addRow("VAT (%):", self.vat_rate_edit)
 
         self.gross_price_edit = QLineEdit(self)
+        self.gross_price_edit.textChanged.connect(self.update_net_price_edit)
         form_layout.addRow("Cena Brutto:", self.gross_price_edit)
 
         self.quantity_edit = QLineEdit(self)
@@ -130,7 +146,7 @@ class WarehouseWindow(QMainWindow):
             }
 
             QTableWidget::item {
-                padding: 10px;  /* Zwiększenie wysokości rubryki */
+                padding: 20px;  /* Zwiększenie wysokości rubryki */
             }
 
             QTableWidget::item:selected {
@@ -165,6 +181,15 @@ class WarehouseWindow(QMainWindow):
             self.gross_price_edit.setText(f"{gross_price:.2f}")
         except ValueError:
             self.gross_price_edit.clear()
+
+    def update_net_price_edit(self):
+        try:
+            gross_price = float(self.gross_price_edit.text())
+            vat_rate = float(self.vat_rate_edit.text())
+            net_price = gross_price / (1 + vat_rate / 100)
+            self.net_price_edit.setText(f"{net_price:.2f}")
+        except ValueError:
+            self.net_price_edit.clear()
 
     def add_product(self):
         ean = self.ean_edit.text()
@@ -202,6 +227,9 @@ class WarehouseWindow(QMainWindow):
             remove_button.clicked.connect(lambda _, row=row_position: self.remove_product_row(row))
             remove_button.setStyleSheet("background-color: #e74c3c; color: white; font-size: 14px; border: 2px solid #e74c3c; border-radius: 8px; padding: 8px;")
             self.table.setCellWidget(row_position, 8, remove_button)
+
+            # Zwiększenie wysokości rubryki o 20 pikseli
+            self.table.setRowHeight(row_position, self.table.rowHeight(row_position) + 20)
 
             self.clear_form()
 
@@ -273,6 +301,8 @@ class WarehouseWindow(QMainWindow):
     def remove_product_row(self, row):
         confirmation = QMessageBox.question(self, "Potwierdzenie", "Czy na pewno chcesz usunąć ten produkt?", QMessageBox.Yes | QMessageBox.No)
         if confirmation == QMessageBox.Yes:
+            # Zmniejszenie wysokości rubryki o 20 pikseli
+            self.table.setRowHeight(row, self.table.rowHeight(row) - 20)
             self.table.removeRow(row)
             self.clear_form()
 
@@ -281,6 +311,11 @@ if __name__ == "__main__":
     window = WarehouseWindow()
     window.show()
     sys.exit(app.exec_())
+
+
+
+
+
 
 
 
