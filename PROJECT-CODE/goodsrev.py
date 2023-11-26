@@ -1,141 +1,191 @@
 import sys
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QVBoxLayout, QPushButton, QDialog, QFormLayout, QLabel, QLineEdit, QTextEdit, QTableWidget, QTableWidgetItem, QWidget, QDesktopWidget, QMessageBox
+    QApplication, QMainWindow, QVBoxLayout, QWidget, QGridLayout,
+    QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem,
+    QFormLayout, QDialog, QMessageBox
 )
-from PyQt5.QtGui import QPixmap, QFont
+from PyQt5.QtGui import QPixmap, QColor, QPalette, QFont
+from PyQt5.QtCore import Qt
 
 class Product:
-    def __init__(self, ean, name, description, net_price, gross_price, vat_rate, manufacturer, quantity):
+    def __init__(self, ean, name, description, net_price, vat_rate, quantity):
         self.ean = ean
         self.name = name
         self.description = description
         self.net_price = net_price
-        self.gross_price = gross_price
         self.vat_rate = vat_rate
-        self.manufacturer = manufacturer
         self.quantity = quantity
+        self.calculate_gross_price()
+
+    def calculate_gross_price(self):
+        self.gross_price = self.net_price * (1 + self.vat_rate / 100)
 
 class WarehouseWindow(QMainWindow):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__()
 
         self.setWindowTitle("Towary w Magazynie")
+        self.setGeometry(100, 100, 800, 600)  # Ustaw rozmiar okna na przykład 800x600
 
-        # Ustawienie rozmiaru okna na całą dostępną przestrzeń monitora
-        screen_size = QDesktopWidget().availableGeometry()
-        self.setGeometry(0, 0, screen_size.width(), screen_size.height())
-
-        # Dodanie obrazu jako tła
-        background_label = QLabel(self)
-        pixmap = QPixmap("C:/Users/mperz/Desktop/MAIG WAREHOUSE/PROJECT-CODE/main.png")
-        background_label.setPixmap(pixmap.scaled(screen_size.width(), screen_size.height()))
-        background_label.setGeometry(0, 0, screen_size.width(), screen_size.height())
-
-        self.central_widget = QWidget()
+        # Ustaw tło okna
+        self.setStyleSheet("background-color: #2c3e50;")  # Kolor tła
+        self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
 
-        self.layout = QVBoxLayout()
-        self.central_widget.setLayout(self.layout)
+        self.layout = QGridLayout(self.central_widget)
 
-        self.table = QTableWidget()
-        self.table.setColumnCount(8)
-        self.table.setHorizontalHeaderLabels(["EAN", "Nazwa", "Opis", "Cena Netto", "Cena Brutto", "Stawka VAT", "Producent", "Ilość"])
-        self.layout.addWidget(self.table)
+        # Tabela
+        self.table = QTableWidget(self)
+        self.table.setColumnCount(7)
+        self.table.setHorizontalHeaderLabels(["EAN", "Nazwa", "Opis", "Cena Netto", "VAT", "Cena Brutto", "Ilość"])
+        self.table.setStyleSheet("background-color: #ecf0f1; color: #333333; font-size: 14px;")
+        self.layout.addWidget(self.table, 0, 0, 1, 3)
 
-        self.button_add = QPushButton("Dodaj Produkt")
-        self.button_add.clicked.connect(self.add_product)
-        self.layout.addWidget(self.button_add)
+        # Formularz dodawania/edycji produktu
+        self.form_layout = QFormLayout()
+        self.ean_edit = QLineEdit(self)
+        self.form_layout.addRow("EAN:", self.ean_edit)
+        self.name_edit = QLineEdit(self)
+        self.form_layout.addRow("Nazwa:", self.name_edit)
+        self.description_edit = QLineEdit(self)
+        self.form_layout.addRow("Opis:", self.description_edit)
+        self.net_price_edit = QLineEdit(self)
+        self.form_layout.addRow("Cena Netto:", self.net_price_edit)
+        self.vat_rate_edit = QLineEdit(self)
+        self.form_layout.addRow("VAT (%):", self.vat_rate_edit)
+        self.gross_price_label = QLabel(self)
+        self.form_layout.addRow("Cena Brutto:", self.gross_price_label)
+        self.quantity_edit = QLineEdit(self)
+        self.form_layout.addRow("Ilość:", self.quantity_edit)
+
+        self.layout.addLayout(self.form_layout, 1, 0, 1, 2)
+
+        # Przyciski
+        self.add_button = QPushButton("Dodaj", self)
+        self.add_button.clicked.connect(self.add_product)
+        self.layout.addWidget(self.add_button, 2, 0)
+
+        self.edit_button = QPushButton("Edytuj", self)
+        self.edit_button.clicked.connect(self.edit_product)
+        self.layout.addWidget(self.edit_button, 2, 1)
+
+        self.remove_button = QPushButton("Usuń", self)
+        self.remove_button.clicked.connect(self.remove_product)
+        self.layout.addWidget(self.remove_button, 2, 2)
+
+        # Inne ustawienia
+        self.selected_row = -1  # Numer zaznaczonego wiersza w tabeli
+        self.setup_styles()
+
+    def setup_styles(self):
+        # Stylizacja elementów
+        self.setStyleSheet("QLabel { color: black; font-size: 14px; font-weight: bold; }"
+                           "QLineEdit { background-color: #ffffff; color: #333333; font-size: 14px; }"
+                           "QTableWidget { background-color: #ffffff; color: #333333; font-size: 14px; }"
+                           "QPushButton { background-color: #3498db; color: white; font-size: 14px; }")
+
+    def clear_form(self):
+        self.ean_edit.clear()
+        self.name_edit.clear()
+        self.description_edit.clear()
+        self.net_price_edit.clear()
+        self.vat_rate_edit.clear()
+        self.gross_price_label.clear()
+        self.quantity_edit.clear()
+
+    def update_gross_price_label(self):
+        try:
+            net_price = float(self.net_price_edit.text())
+            vat_rate = float(self.vat_rate_edit.text())
+            gross_price = net_price * (1 + vat_rate / 100)
+            self.gross_price_label.setText(f"{gross_price:.2f}")
+        except ValueError:
+            self.gross_price_label.clear()
 
     def add_product(self):
-        dialog = AddProductDialog(self)
-        result = dialog.exec_()
-        if result == QDialog.Accepted:
-            product = dialog.get_product()
-            if product:
-                self.add_to_table(product)
-
-    def add_to_table(self, product):
-        row_position = self.table.rowCount()
-        self.table.insertRow(row_position)
-
-        self.table.setItem(row_position, 0, QTableWidgetItem(product.ean))
-        self.table.setItem(row_position, 1, QTableWidgetItem(product.name))
-        self.table.setItem(row_position, 2, QTableWidgetItem(product.description))
-        self.table.setItem(row_position, 3, QTableWidgetItem(str(product.net_price)))
-        self.table.setItem(row_position, 4, QTableWidgetItem(str(product.gross_price)))
-        self.table.setItem(row_position, 5, QTableWidgetItem(str(product.vat_rate)))
-        self.table.setItem(row_position, 6, QTableWidgetItem(product.manufacturer))
-        self.table.setItem(row_position, 7, QTableWidgetItem(str(product.quantity)))
-
-class AddProductDialog(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Dodaj Produkt")
-
-        self.setStyleSheet("background-color: lightblue;")
-
-        self.layout = QFormLayout()
-
-        self.ean_edit = QLineEdit(self)
-        self.layout.addRow(QLabel("EAN:"), self.ean_edit)
-
-        self.name_edit = QLineEdit(self)
-        self.layout.addRow(QLabel("Nazwa:"), self.name_edit)
-
-        self.description_edit = QLineEdit(self)
-        self.layout.addRow(QLabel("Opis:"), self.description_edit)
-
-        self.net_price_edit = QLineEdit(self)
-        self.layout.addRow(QLabel("Cena Netto:"), self.net_price_edit)
-
-        self.gross_price_edit = QLineEdit(self)
-        self.layout.addRow(QLabel("Cena Brutto:"), self.gross_price_edit)
-
-        self.vat_rate_edit = QLineEdit(self)
-        self.layout.addRow(QLabel("Stawka VAT:"), self.vat_rate_edit)
-
-        self.manufacturer_edit = QLineEdit(self)
-        self.layout.addRow(QLabel("Producent:"), self.manufacturer_edit)
-
-        self.quantity_edit = QLineEdit(self)
-        self.layout.addRow(QLabel("Ilość:"), self.quantity_edit)
-
-        self.button_add = QPushButton("Dodaj")
-        self.button_add.clicked.connect(self.accept)
-        self.layout.addWidget(self.button_add)
-
-        self.setLayout(self.layout)
-
-    def get_product(self):
         ean = self.ean_edit.text()
         name = self.name_edit.text()
         description = self.description_edit.text()
         net_price = self.net_price_edit.text()
-        gross_price = self.gross_price_edit.text()
         vat_rate = self.vat_rate_edit.text()
-        manufacturer = self.manufacturer_edit.text()
         quantity = self.quantity_edit.text()
-
-        if not all([ean, name, description, net_price, gross_price, vat_rate, manufacturer, quantity]):
-            QMessageBox.warning(self, "Błąd", "Wypełnij wszystkie pola!")
-            return None
 
         try:
             net_price = float(net_price)
-            gross_price = float(gross_price)
             vat_rate = float(vat_rate)
             quantity = int(quantity)
+
+            product = Product(ean, name, description, net_price, vat_rate, quantity)
+
+            # Dodaj produkt do tabeli
+            row_position = self.table.rowCount()
+            self.table.insertRow(row_position)
+            self.table.setItem(row_position, 0, QTableWidgetItem(product.ean))
+            self.table.setItem(row_position, 1, QTableWidgetItem(product.name))
+            self.table.setItem(row_position, 2, QTableWidgetItem(product.description))
+            self.table.setItem(row_position, 3, QTableWidgetItem(f"{product.net_price:.2f}"))
+            self.table.setItem(row_position, 4, QTableWidgetItem(f"{product.vat_rate:.2f}"))
+            self.table.setItem(row_position, 5, QTableWidgetItem(f"{product.gross_price:.2f}"))
+            self.table.setItem(row_position, 6, QTableWidgetItem(str(product.quantity)))
+
+            self.clear_form()
+
         except ValueError:
             QMessageBox.warning(self, "Błąd", "Niepoprawne wartości liczbowe!")
-            return None
 
-        return Product(ean, name, description, net_price, gross_price, vat_rate, manufacturer, quantity)
+    def edit_product(self):
+        if self.selected_row == -1:
+            QMessageBox.warning(self, "Błąd", "Nie wybrano produktu do edycji.")
+            return
+
+        ean = self.ean_edit.text()
+        name = self.name_edit.text()
+        description = self.description_edit.text()
+        net_price = self.net_price_edit.text()
+        vat_rate = self.vat_rate_edit.text()
+        quantity = self.quantity_edit.text()
+
+        try:
+            net_price = float(net_price)
+            vat_rate = float(vat_rate)
+            quantity = int(quantity)
+
+            product = Product(ean, name, description, net_price, vat_rate, quantity)
+
+            # Edytuj zaznaczony wiersz
+            self.table.setItem(self.selected_row, 0, QTableWidgetItem(product.ean))
+            self.table.setItem(self.selected_row, 1, QTableWidgetItem(product.name))
+            self.table.setItem(self.selected_row, 2, QTableWidgetItem(product.description))
+            self.table.setItem(self.selected_row, 3, QTableWidgetItem(f"{product.net_price:.2f}"))
+            self.table.setItem(self.selected_row, 4, QTableWidgetItem(f"{product.vat_rate:.2f}"))
+            self.table.setItem(self.selected_row, 5, QTableWidgetItem(f"{product.gross_price:.2f}"))
+            self.table.setItem(self.selected_row, 6, QTableWidgetItem(str(product.quantity)))
+
+            self.clear_form()
+
+        except ValueError:
+            QMessageBox.warning(self, "Błąd", "Niepoprawne wartości liczbowe!")
+
+    def remove_product(self):
+        if self.selected_row == -1:
+            QMessageBox.warning(self, "Błąd", "Nie wybrano produktu do usunięcia.")
+            return
+
+        self.table.removeRow(self.selected_row)
+        self.clear_form()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = WarehouseWindow()
     window.show()
     sys.exit(app.exec_())
+
+
+
+
+
+
+
 
 
 
