@@ -23,6 +23,7 @@ class WarehouseWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Towary w Magazynie")
+        
 
         palette = QPalette()
         palette.setColor(QPalette.Window, QColor(90, 90, 90))
@@ -52,6 +53,7 @@ class WarehouseWindow(QMainWindow):
         form_group_layout.setContentsMargins(0, 10, 0, 0)
 
         form_layout = QFormLayout()
+        
 
         self.index_edit = QLineEdit(self)
         form_layout.addRow("INDEX:", self.index_edit)
@@ -240,6 +242,11 @@ class WarehouseWindow(QMainWindow):
             self.table.setRowHeight(row, new_height)
             self.table.removeRow(row)
             self.clear_form()
+            
+    def closeEvent(self, event):
+        # Ukryj okno zamiast go zamykać
+        self.hide()
+        event.ignore()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -1,1 +1,2 @@
-on_sett_butto
+
+class CentralWindowMain(QtWidgets.QDialog):

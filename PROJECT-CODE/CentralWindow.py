@@ -5,6 +5,7 @@ from settoptionspy import OknoUstawien
 from seasonoftrends import TrendSeasonalityWindow
 from complains import KlientWindow
 from clientsdb import MainWindowcl
+from goodsrev import WarehouseWindow
 import sys
 import subprocess
 
@@ -14,9 +15,11 @@ class CentralWindowMain(QtWidgets.QDialog):
         
         screen_resolution = QtWidgets.QDesktopWidget().screenGeometry()
         width, height = screen_resolution.width() * 1.0, screen_resolution.height() * 0.98
-        self.setGeometry(0, 0, width, height)
+        self.setGeometry(0, 0, int(width), int(height))
         
         self.setWindowTitle("MAIG WAREHOUSE APPLICATION v1.0.1")
+        
+        self.revgood_window = None
         
         qr = self.frameGeometry()
         cp = QtWidgets.QDesktopWidget().availableGeometry().center()
@@ -56,6 +59,9 @@ class CentralWindowMain(QtWidgets.QDialog):
                 
             elif label == 'Klienci':
                 button.clicked.connect(self.clients_pow)
+                
+            elif label == 'Przegląd Towarów':
+                button.clicked.connect(self.goods_review)
                 
         
         help_button = QtWidgets.QPushButton('Pomoc')
@@ -186,9 +192,18 @@ class CentralWindowMain(QtWidgets.QDialog):
       
     def purchases_costs(self):
         pass
+    
+    
+    def clicked_goods(self):
+        if self.sender().text() == 'Przegląd Towarów':
+            self.goods_review()
       
     def goods_review(self):
-        pass
+        # Sprawdź, czy okno już istnieje
+        if not self.revgood_window or not self.revgood_window.isVisible():
+            # Utwórz okno tylko wtedy, gdy nie istnieje lub jest ukryte
+            self.revgood_window = WarehouseWindow()
+            self.revgood_window.show()
     
     
     def on_button_clients(self):
