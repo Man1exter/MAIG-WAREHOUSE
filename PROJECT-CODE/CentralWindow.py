@@ -6,6 +6,7 @@ from seasonoftrends import TrendSeasonalityWindow
 from complains import KlientWindow
 from clientsdb import MainWindowcl
 from goodsrev import WarehouseWindow
+from purchases import FakturaWindow
 import sys
 import subprocess
 
@@ -20,6 +21,7 @@ class CentralWindowMain(QtWidgets.QDialog):
         self.setWindowTitle("MAIG WAREHOUSE APPLICATION v1.0.1")
         
         self.revgood_window = None
+        self.revgoods_window = None
         
         qr = self.frameGeometry()
         cp = QtWidgets.QDesktopWidget().availableGeometry().center()
@@ -62,6 +64,9 @@ class CentralWindowMain(QtWidgets.QDialog):
                 
             elif label == 'Przegląd Towarów':
                 button.clicked.connect(self.goods_review)
+                
+            elif label == 'Zakupy':
+                button.clicked.connect(self.purchases_costs)
                 
         
         help_button = QtWidgets.QPushButton('Pomoc')
@@ -189,9 +194,17 @@ class CentralWindowMain(QtWidgets.QDialog):
         
     def show_docs(self):
         pass
+    
+    
+    def click_purchase(self):
+        if self.sender().text() == 'Zakupy':
+            self.purchases_costs()
       
     def purchases_costs(self):
-        pass
+        if not self.revgoods_window or not self.revgoods_window.isVisible():
+            self.revgoods_window = FakturaWindow()
+            self.revgoods_window.show()
+    
     
     
     def clicked_goods(self):
