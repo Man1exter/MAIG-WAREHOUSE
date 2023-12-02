@@ -19,9 +19,9 @@ class FakturaWindow(QWidget):
         self.firma_edit = QLineEdit(self)
 
         self.pozycje_table = QTableWidget(self)
-        self.pozycje_table.setColumnCount(6)
+        self.pozycje_table.setColumnCount(9)
         self.pozycje_table.setHorizontalHeaderLabels(
-            ["Nazwa", "Ilość", "Cena Netto", "Cena Brutto", "Stawka VAT", "Suma"])
+            ["EAN", "INDEX", "OPIS", "Nazwa", "Ilość", "Cena Netto", "Cena Brutto", "Stawka VAT", "Suma"])
         header = self.pozycje_table.horizontalHeader()
         header.setStyleSheet("QHeaderView::section { background-color: #4CAF50; color: #fff; font-size: 16px; }")
         self.pozycje_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -92,6 +92,9 @@ class FakturaWindow(QWidget):
         dialog = DodajPozycjeDialog(self)
         result = dialog.exec_()
         if result == QDialog.Accepted:
+            ean = dialog.ean_edit.text()
+            index = dialog.index_edit.text()
+            opis = dialog.opis_edit.text()
             nazwa = dialog.nazwa_edit.text()
             ilosc = float(dialog.ilosc_edit.text())
             cena_netto = float(dialog.cena_netto_edit.text())
@@ -102,12 +105,15 @@ class FakturaWindow(QWidget):
 
             row_position = self.pozycje_table.rowCount()
             self.pozycje_table.insertRow(row_position)
-            self.pozycje_table.setItem(row_position, 0, QTableWidgetItem(nazwa))
-            self.pozycje_table.setItem(row_position, 1, QTableWidgetItem(str(ilosc)))
-            self.pozycje_table.setItem(row_position, 2, QTableWidgetItem(str(cena_netto)))
-            self.pozycje_table.setItem(row_position, 3, QTableWidgetItem(str(cena_brutto)))
-            self.pozycje_table.setItem(row_position, 4, QTableWidgetItem(str(stawka_vat)))
-            self.pozycje_table.setItem(row_position, 5, QTableWidgetItem(str(suma)))
+            self.pozycje_table.setItem(row_position, 0, QTableWidgetItem(ean))
+            self.pozycje_table.setItem(row_position, 1, QTableWidgetItem(index))
+            self.pozycje_table.setItem(row_position, 2, QTableWidgetItem(opis))
+            self.pozycje_table.setItem(row_position, 3, QTableWidgetItem(nazwa))
+            self.pozycje_table.setItem(row_position, 4, QTableWidgetItem(str(ilosc)))
+            self.pozycje_table.setItem(row_position, 5, QTableWidgetItem(str(cena_netto)))
+            self.pozycje_table.setItem(row_position, 6, QTableWidgetItem(str(cena_brutto)))
+            self.pozycje_table.setItem(row_position, 7, QTableWidgetItem(str(stawka_vat)))
+            self.pozycje_table.setItem(row_position, 8, QTableWidgetItem(str(suma)))
 
     def zapisz_fakture(self):
         nazwa = self.nazwa_edit.text()
@@ -119,12 +125,15 @@ class FakturaWindow(QWidget):
         pozycje = []
         for row in range(self.pozycje_table.rowCount()):
             pozycja = {
-                "nazwa": self.pozycje_table.item(row, 0).text(),
-                "ilosc": float(self.pozycje_table.item(row, 1).text()),
-                "cena_netto": float(self.pozycje_table.item(row, 2).text()),
-                "cena_brutto": float(self.pozycje_table.item(row, 3).text()),
-                "stawka_vat": float(self.pozycje_table.item(row, 4).text()),
-                "suma": float(self.pozycje_table.item(row, 5).text())
+                "ean": self.pozycje_table.item(row, 0).text(),
+                "index": self.pozycje_table.item(row, 1).text(),
+                "opis": self.pozycje_table.item(row, 2).text(),
+                "nazwa": self.pozycje_table.item(row, 3).text(),
+                "ilosc": float(self.pozycje_table.item(row, 4).text()),
+                "cena_netto": float(self.pozycje_table.item(row, 5).text()),
+                "cena_brutto": float(self.pozycje_table.item(row, 6).text()),
+                "stawka_vat": float(self.pozycje_table.item(row, 7).text()),
+                "suma": float(self.pozycje_table.item(row, 8).text())
             }
             pozycje.append(pozycja)
 
@@ -162,9 +171,15 @@ class FakturaWindow(QWidget):
 class DodajPozycjeDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
+        
+        self.setWindowTitle("Dodaj Pozycję")
+        self.setGeometry(800, 400, 400, 300)
 
         layout = QFormLayout()
 
+        self.ean_edit = QLineEdit(self)
+        self.index_edit = QLineEdit(self)
+        self.opis_edit = QLineEdit(self)
         self.nazwa_edit = QLineEdit(self)
         self.ilosc_edit = QLineEdit(self)
         self.cena_netto_edit = QLineEdit(self)
@@ -175,6 +190,9 @@ class DodajPozycjeDialog(QDialog):
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
 
+        layout.addRow("EAN:", self.ean_edit)
+        layout.addRow("INDEX:", self.index_edit)
+        layout.addRow("OPIS:", self.opis_edit)
         layout.addRow("Nazwa:", self.nazwa_edit)
         layout.addRow("Ilość:", self.ilosc_edit)
         layout.addRow("Cena Netto:", self.cena_netto_edit)
@@ -233,9 +251,9 @@ class PozycjeFakturyDialog(QDialog):
         layout = QVBoxLayout()
 
         self.pozycje_list = QTableWidget(self)
-        self.pozycje_list.setColumnCount(6)
+        self.pozycje_list.setColumnCount(9)
         self.pozycje_list.setHorizontalHeaderLabels(
-            ["Nazwa", "Ilość", "Cena Netto", "Cena Brutto", "Stawka VAT", "Suma"])
+            ["EAN", "INDEX", "OPIS", "Nazwa", "Ilość", "Cena Netto", "Cena Brutto", "Stawka VAT", "Suma"])
         header = self.pozycje_list.horizontalHeader()
         header.setStyleSheet("QHeaderView::section { background-color: #4CAF50; color: #fff; font-size: 16px; }")
         self.pozycje_list.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -243,12 +261,15 @@ class PozycjeFakturyDialog(QDialog):
         for pozycja in faktura["pozycje"]:
             row_position = self.pozycje_list.rowCount()
             self.pozycje_list.insertRow(row_position)
-            self.pozycje_list.setItem(row_position, 0, QTableWidgetItem(pozycja["nazwa"]))
-            self.pozycje_list.setItem(row_position, 1, QTableWidgetItem(str(pozycja["ilosc"])))
-            self.pozycje_list.setItem(row_position, 2, QTableWidgetItem(str(pozycja["cena_netto"])))
-            self.pozycje_list.setItem(row_position, 3, QTableWidgetItem(str(pozycja["cena_brutto"])))
-            self.pozycje_list.setItem(row_position, 4, QTableWidgetItem(str(pozycja["stawka_vat"])))
-            self.pozycje_list.setItem(row_position, 5, QTableWidgetItem(str(pozycja["suma"])))
+            self.pozycje_list.setItem(row_position, 0, QTableWidgetItem(pozycja["ean"]))
+            self.pozycje_list.setItem(row_position, 1, QTableWidgetItem(pozycja["index"]))
+            self.pozycje_list.setItem(row_position, 2, QTableWidgetItem(pozycja["opis"]))
+            self.pozycje_list.setItem(row_position, 3, QTableWidgetItem(pozycja["nazwa"]))
+            self.pozycje_list.setItem(row_position, 4, QTableWidgetItem(str(pozycja["ilosc"])))
+            self.pozycje_list.setItem(row_position, 5, QTableWidgetItem(str(pozycja["cena_netto"])))
+            self.pozycje_list.setItem(row_position, 6, QTableWidgetItem(str(pozycja["cena_brutto"])))
+            self.pozycje_list.setItem(row_position, 7, QTableWidgetItem(str(pozycja["stawka_vat"])))
+            self.pozycje_list.setItem(row_position, 8, QTableWidgetItem(str(pozycja["suma"])))
 
         layout.addWidget(self.pozycje_list)
 
@@ -266,6 +287,7 @@ if __name__ == "__main__":
     faktura_window = FakturaWindow()
     faktura_window.showMaximized()
     sys.exit(app.exec_())
+
 
 
 

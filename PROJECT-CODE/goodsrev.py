@@ -244,7 +244,7 @@ class WarehouseWindow(QMainWindow):
             self.clear_form()
             
     def closeEvent(self, event):
-        # Ukryj okno zamiast go zamykać
+
         self.hide()
         event.ignore()
 
