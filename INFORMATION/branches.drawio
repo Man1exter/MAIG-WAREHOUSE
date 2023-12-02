@@ -600,6 +600,9 @@
                         <mxPoint x="910" y="1810" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
+                <mxCell id="138" value="&lt;h1&gt;db&lt;/h1&gt;&lt;p&gt;centralwindow&lt;/p&gt;&lt;p&gt;clientsdb&lt;/p&gt;&lt;p&gt;complains&lt;/p&gt;&lt;p&gt;goodsrev&lt;/p&gt;&lt;p&gt;helpbarsection&lt;/p&gt;&lt;p&gt;logreguser&lt;/p&gt;&lt;p&gt;main&lt;/p&gt;&lt;p&gt;purchases&lt;/p&gt;&lt;p&gt;registration&lt;/p&gt;&lt;p&gt;seasonoftrends&lt;/p&gt;&lt;p&gt;settings&lt;/p&gt;&lt;p&gt;seetoptions&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="1051" y="1880" width="190" height="360" as="geometry"/>
+                </mxCell>
             </root>
         </mxGraphModel>
     </diagram>
