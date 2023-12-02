@@ -37,7 +37,7 @@ class CentralWindowMain(QtWidgets.QDialog):
         self.setPalette(palette)
         
         navigation_layout = QtWidgets.QHBoxLayout()
-        button_labels = ['Wystaw Dokument', 'Przegląd Dokumentów', 'Zakupy i Koszty', 'Przegląd Towarów', 'Klienci', 'Reklamacje', 'Raporty i Statystyki', 'Trend i Sezonowość', 'Ustawienia Programu', 'Pomoc']
+        button_labels = ['Wystaw Dokument', 'Przegląd Dokumentów', 'Zakupy', 'Przegląd Towarów', 'Klienci', 'Reklamacje', 'Raporty i Statystyki', 'Trend i Sezonowość', 'Ustawienia Programu', 'Pomoc']
         
         for label in button_labels:
             button = QtWidgets.QPushButton(label)
