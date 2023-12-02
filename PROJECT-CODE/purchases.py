@@ -1,6 +1,8 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit, QTableWidget, QTableWidgetItem, QDialog, QFormLayout, QDialogButtonBox, QHeaderView
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit, QTableWidget, \
+    QTableWidgetItem, QDialog, QFormLayout, QDialogButtonBox, QHeaderView, QMessageBox
 from PyQt5.QtCore import Qt, QDateTime
+
 
 class FakturaWindow(QWidget):
     def __init__(self):
@@ -18,7 +20,10 @@ class FakturaWindow(QWidget):
 
         self.pozycje_table = QTableWidget(self)
         self.pozycje_table.setColumnCount(6)
-        self.pozycje_table.setHorizontalHeaderLabels(["Nazwa", "Ilość", "Cena Netto", "Cena Brutto", "Stawka VAT", "Suma"])
+        self.pozycje_table.setHorizontalHeaderLabels(
+            ["Nazwa", "Ilość", "Cena Netto", "Cena Brutto", "Stawka VAT", "Suma"])
+        header = self.pozycje_table.horizontalHeader()
+        header.setStyleSheet("QHeaderView::section { background-color: #4CAF50; color: #fff; font-size: 16px; }")
         self.pozycje_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         dodaj_pozycje_button = QPushButton("Dodaj pozycję", self)
@@ -46,7 +51,6 @@ class FakturaWindow(QWidget):
         layout.addWidget(zapisz_button)
         layout.addWidget(zapisane_faktury_button)
 
-        # Ustaw kolorystykę i styl
         self.setStyleSheet("""
             QWidget {
                 background-color: #f8f8f8;
@@ -73,6 +77,12 @@ class FakturaWindow(QWidget):
 
             QPushButton:hover {
                 background-color: #45a049;
+            }
+
+            QHeaderView {
+                background-color: #4CAF50;
+                color: #fff;
+                font-size: 16px;
             }
         """)
 
@@ -131,8 +141,13 @@ class FakturaWindow(QWidget):
         self.faktury.append(faktura)
         self.clear_fields()
 
+        # Wyświetl potwierdzenie
+        QMessageBox.information(self, "Potwierdzenie", "Faktura została zapisana pomyślnie!")
+
     def pokaz_zapisane_faktury(self):
         zapisane_faktury_dialog = ZapisaneFakturyDialog(self.faktury, self)
+        # Powiększ okno dialogowe na cały ekran monitora
+        zapisane_faktury_dialog.showMaximized()
         zapisane_faktury_dialog.exec_()
 
     def clear_fields(self):
@@ -173,12 +188,15 @@ class DodajPozycjeDialog(QDialog):
 class ZapisaneFakturyDialog(QDialog):
     def __init__(self, faktury, parent=None):
         super().__init__(parent)
+        self.faktury = faktury  # Dodane pole faktury
 
         layout = QVBoxLayout()
 
         self.faktury_list = QTableWidget(self)
         self.faktury_list.setColumnCount(4)
         self.faktury_list.setHorizontalHeaderLabels(["Nazwa", "Index", "Data Wystawienia", "Firma"])
+        header = self.faktury_list.horizontalHeader()
+        header.setStyleSheet("QHeaderView::section { background-color: #4CAF50; color: #fff; font-size: 16px; }")
         self.faktury_list.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         for faktura in faktury:
@@ -189,7 +207,50 @@ class ZapisaneFakturyDialog(QDialog):
             self.faktury_list.setItem(row_position, 2, QTableWidgetItem(faktura["data_wystawienia"]))
             self.faktury_list.setItem(row_position, 3, QTableWidgetItem(faktura["firma"]))
 
+        self.faktury_list.clicked.connect(self.pokaz_pozycje_faktury)
+
         layout.addWidget(self.faktury_list)
+
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok, Qt.Horizontal, self)
+        buttons.accepted.connect(self.accept)
+
+        layout.addWidget(buttons)
+
+        self.setLayout(layout)
+
+    def pokaz_pozycje_faktury(self):
+        selected_row = self.faktury_list.currentRow()
+        if selected_row >= 0:
+            faktura = self.faktury[selected_row]
+            pozycje_dialog = PozycjeFakturyDialog(faktura, self)
+            pozycje_dialog.exec_()
+
+
+class PozycjeFakturyDialog(QDialog):
+    def __init__(self, faktura, parent=None):
+        super().__init__(parent)
+
+        layout = QVBoxLayout()
+
+        self.pozycje_list = QTableWidget(self)
+        self.pozycje_list.setColumnCount(6)
+        self.pozycje_list.setHorizontalHeaderLabels(
+            ["Nazwa", "Ilość", "Cena Netto", "Cena Brutto", "Stawka VAT", "Suma"])
+        header = self.pozycje_list.horizontalHeader()
+        header.setStyleSheet("QHeaderView::section { background-color: #4CAF50; color: #fff; font-size: 16px; }")
+        self.pozycje_list.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+        for pozycja in faktura["pozycje"]:
+            row_position = self.pozycje_list.rowCount()
+            self.pozycje_list.insertRow(row_position)
+            self.pozycje_list.setItem(row_position, 0, QTableWidgetItem(pozycja["nazwa"]))
+            self.pozycje_list.setItem(row_position, 1, QTableWidgetItem(str(pozycja["ilosc"])))
+            self.pozycje_list.setItem(row_position, 2, QTableWidgetItem(str(pozycja["cena_netto"])))
+            self.pozycje_list.setItem(row_position, 3, QTableWidgetItem(str(pozycja["cena_brutto"])))
+            self.pozycje_list.setItem(row_position, 4, QTableWidgetItem(str(pozycja["stawka_vat"])))
+            self.pozycje_list.setItem(row_position, 5, QTableWidgetItem(str(pozycja["suma"])))
+
+        layout.addWidget(self.pozycje_list)
 
         buttons = QDialogButtonBox(QDialogButtonBox.Ok, Qt.Horizontal, self)
         buttons.accepted.connect(self.accept)
@@ -205,6 +266,10 @@ if __name__ == "__main__":
     faktura_window = FakturaWindow()
     faktura_window.showMaximized()
     sys.exit(app.exec_())
+
+
+
+
 
 
 
