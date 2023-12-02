@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit, QTableWidget, \
     QTableWidgetItem, QDialog, QFormLayout, QDialogButtonBox, QHeaderView, QMessageBox
 from PyQt5.QtCore import Qt, QDateTime
+from PyQt5.QtPrintSupport import QPrinter, QPrintDialog
 
 
 class FakturaWindow(QWidget):
@@ -242,6 +243,37 @@ class ZapisaneFakturyDialog(QDialog):
             faktura = self.faktury[selected_row]
             pozycje_dialog = PozycjeFakturyDialog(faktura, self)
             pozycje_dialog.exec_()
+            
+    def drukuj_fakture(self):
+        selected_row = self.faktury_list.currentRow()
+        if selected_row >= 0:
+            faktura = self.faktury[selected_row]
+            drukarka = QPrinter()
+            dialog_druku = QPrintDialog(drukarka, self)
+            if dialog_druku.exec_() == QPrintDialog.Accepted:
+                self.drukuj(drukarka, faktura)
+
+    def drukuj(self, drukarka, faktura):
+        painter = QPainter()
+        painter.begin(drukarka)
+
+        y_offset = 100  
+        line_height = 20  
+        for key, value in faktura.items():
+            text = f"{key}: {value}"
+            painter.drawText(100, y_offset, text)
+            y_offset += line_height
+
+        y_offset += 20  
+        for pozycja in faktura["pozycje"]:
+            for key, value in pozycja.items():
+                text = f"{key}: {value}"
+                painter.drawText(120, y_offset, text)
+                y_offset += line_height
+
+        painter.end()
+
+        QMessageBox.information(self, "Drukowanie", "Faktura została wydrukowana pomyślnie!")
 
 
 class PozycjeFakturyDialog(QDialog):
