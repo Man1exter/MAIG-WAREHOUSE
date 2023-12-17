@@ -16,7 +16,7 @@ class WarehouseReportsPanel(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Panel Raportów Magazynowych")
-        self.setGeometry(100, 100, 1000, 600)  # Increased window width
+        self.setGeometry(100, 100, 1000, 600)
 
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
@@ -74,6 +74,9 @@ class WarehouseReportsPanel(QMainWindow):
         plot_button = QPushButton("Generuj Wykres Kolumnowy", self)
         plot_button.clicked.connect(self.generate_column_chart)
 
+        line_chart_button = QPushButton("Generuj Wykres Liniowy Wzrostu Cen", self)
+        line_chart_button.clicked.connect(self.generate_price_growth_line_chart)
+
         sales_report_button = QPushButton("Generuj Raport Sprzedaży", self)
         sales_report_button.clicked.connect(self.generate_sales_report)
 
@@ -83,6 +86,7 @@ class WarehouseReportsPanel(QMainWindow):
         form_layout.addRow(self.date_label, self.date_edit)
         form_layout.addRow(self.generate_report_button)
         form_layout.addRow(plot_button)
+        form_layout.addRow(line_chart_button)
         form_layout.addRow(sales_report_button)
 
         main_layout = QVBoxLayout()
@@ -121,15 +125,19 @@ class WarehouseReportsPanel(QMainWindow):
 
                 self.table_widget.setItem(i, j, item)
 
-            # Dodaj kolumny z przeliczonymi kwotami netto i brutto oraz sumą netto i brutto
-            netto_column = data.columns.get_loc('Cena Netto') if 'Cena Netto' in data.columns else -1
-            brutto_column = data.columns.get_loc('Cena Brutto') if 'Cena Brutto' in data.columns else -1
-            ilosc_column = data.columns.get_loc('Ilość') if 'Ilość' in data.columns else -1
-
-            self.table_widget.setItem(i, len(data.columns), QTableWidgetItem(str(data.iloc[i, netto_column] * data.iloc[i, ilosc_column])))
-            self.table_widget.setItem(i, len(data.columns) + 1, QTableWidgetItem(str(data.iloc[i, brutto_column] * data.iloc[i, ilosc_column])))
-            self.table_widget.setItem(i, len(data.columns) + 2, QTableWidgetItem(str(data.iloc[:i + 1, netto_column].sum())))
-            self.table_widget.setItem(i, len(data.columns) + 3, QTableWidgetItem(str(data.iloc[:i + 1, brutto_column].sum())))
+        # Dodaj kolumny z przeliczonymi kwotami netto i brutto oraz sumą netto i brutto
+        netto_column = data.columns.get_loc('Cena Netto') if 'Cena Netto' in data.columns else -1
+        brutto_column = data.columns.get_loc('Cena Brutto') if 'Cena Brutto' in data.columns else -1
+        ilosc_column = data.columns.get_loc('Ilość') if 'Ilość' in data.columns else -1
+        if netto_column != -1 and brutto_column != -1 and ilosc_column != -1:
+            self.table_widget.setItem(i, len(data.columns), QTableWidgetItem(
+                str(data.iloc[i, netto_column] * data.iloc[i, ilosc_column])))
+            self.table_widget.setItem(i, len(data.columns) + 1, QTableWidgetItem(
+                str(data.iloc[i, brutto_column] * data.iloc[i, ilosc_column])))
+            self.table_widget.setItem(i, len(data.columns) + 2, QTableWidgetItem(
+                str(data.iloc[:i + 1, netto_column].sum())))
+            self.table_widget.setItem(i, len(data.columns) + 3, QTableWidgetItem(
+                str(data.iloc[:i + 1, brutto_column].sum())))
 
         self.table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
@@ -189,16 +197,42 @@ class WarehouseReportsPanel(QMainWindow):
 
     def generate_price_growth_data(self):
         price_growth_data = np.random.uniform(0.1, 0.5, size=(10, 3))
-        price_growth_data = pd.DataFrame(price_growth_data, columns=['Produkt', 'Wzrost Cena Netto', 'Wzrost Cena Brutto'])
-        price_growth_data['Cena Netto'] = np.random.uniform(10, 50, size=(10))
-        price_growth_data['Cena Brutto'] = price_growth_data['Cena Netto'] * (1 + price_growth_data['Wzrost Cena Brutto'])
-        return price_growth_data
+        return pd.DataFrame(price_growth_data, columns=['Produkt', 'Wzrost Cena Netto', 'Wzrost Cena Brutto'])
 
     def generate_column_chart(self):
         plt.bar(self.df['Produkt'], self.df['Ilość'])
         plt.xlabel('Produkt')
         plt.ylabel('Ilość')
         plt.title('Wykres Kolumnowy')
+        plt.show()
+
+    def generate_price_growth_line_chart(self):
+        price_growth_data = self.generate_price_growth_data()
+
+        # Sortuj dane według ilości
+        price_growth_data = price_growth_data.sort_values(by='Produkt')
+
+        fig, ax = plt.subplots()
+
+        # Utwórz wykresy
+        ax.plot(price_growth_data['Produkt'], price_growth_data['Wzrost Cena Netto'], label='Wzrost Cena Netto', marker='o')
+        ax.plot(price_growth_data['Produkt'], price_growth_data['Wzrost Cena Brutto'], label='Wzrost Cena Brutto', marker='o')
+
+        # Ustaw osie
+        ax.set_xlabel('Produkt')
+        ax.set_ylabel('Wzrost Cena w Procentach')
+        ax.set_title('Wykres Liniowy Wzrostu Cen i Ilości Dostaw')
+
+        # Dodaj drugie wspólne osie y (po prawej stronie)
+        ax2 = ax.twinx()
+        ax2.set_ylabel('Ilość Dostaw', color='red')
+        ax2.plot(price_growth_data['Produkt'], price_growth_data['Wzrost Cena Netto'], color='red', linestyle='--', marker='o')
+        ax2.tick_params(axis='y', labelcolor='red')
+
+        # Dodaj legendę
+        ax.legend(loc='upper left')
+        ax2.legend(loc='upper right')
+
         plt.show()
 
     def generate_sales_report(self):
@@ -216,6 +250,11 @@ if __name__ == "__main__":
     window = WarehouseReportsPanel()
     window.show()
     sys.exit(app.exec_())
+
+
+
+
+
 
 
 
