@@ -122,9 +122,10 @@ class WarehouseReportsPanel(QMainWindow):
                 self.table_widget.setItem(i, j, item)
 
             # Dodaj kolumny z przeliczonymi kwotami netto i brutto oraz sumą netto i brutto
-            netto_column = data.columns.get_loc('Cena Netto')
-            brutto_column = data.columns.get_loc('Cena Brutto')
-            ilosc_column = data.columns.get_loc('Ilość')
+            netto_column = data.columns.get_loc('Cena Netto') if 'Cena Netto' in data.columns else -1
+            brutto_column = data.columns.get_loc('Cena Brutto') if 'Cena Brutto' in data.columns else -1
+            ilosc_column = data.columns.get_loc('Ilość') if 'Ilość' in data.columns else -1
+
             self.table_widget.setItem(i, len(data.columns), QTableWidgetItem(str(data.iloc[i, netto_column] * data.iloc[i, ilosc_column])))
             self.table_widget.setItem(i, len(data.columns) + 1, QTableWidgetItem(str(data.iloc[i, brutto_column] * data.iloc[i, ilosc_column])))
             self.table_widget.setItem(i, len(data.columns) + 2, QTableWidgetItem(str(data.iloc[:i + 1, netto_column].sum())))
