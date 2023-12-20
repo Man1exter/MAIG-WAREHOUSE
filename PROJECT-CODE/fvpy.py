@@ -2,7 +2,7 @@ import sys
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTableWidget,
-    QTableWidgetItem, QTextEdit, QFormLayout, QGroupBox, QStyleFactory, QSpacerItem, QSizePolicy, QGridLayout, QMessageBox
+    QTableWidgetItem, QTextEdit, QFormLayout, QGroupBox, QStyleFactory, QSpacerItem, QSizePolicy, QGridLayout, QMessageBox, QInputDialog
 )
 from PyQt5.QtPrintSupport import QPrinter, QPrintDialog
 import smtplib
@@ -11,6 +11,18 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from reportlab.pdfgen import canvas
 import random
+
+class Product:
+    def __init__(self, name, price_netto, vat, stock):
+        self.name = name
+        self.price_netto = price_netto
+        self.vat = vat
+        self.stock = stock
+
+class Transaction:
+    def __init__(self, product, quantity):
+        self.product = product
+        self.quantity = quantity
 
 class InvoiceApp(QWidget):
     def __init__(self):
@@ -24,10 +36,10 @@ class InvoiceApp(QWidget):
 
         # Dane firmy
         self.company_data = {
-            'nazwa': '',
-            'adres': '',
-            'email': '',
-            'telefon': ''
+            'nazwa': 'Twoja Firma',
+            'adres': 'ul. Główna 123, Miasto, Kraj',
+            'email': 'twoja_firma@example.com',
+            'telefon': '123-456-7890'
         }
 
         # Dane klienta
@@ -40,12 +52,14 @@ class InvoiceApp(QWidget):
 
         # Produkty
         self.products = [
-            {'nazwa': 'Produkt 1', 'cena_netto': 50.0, 'vat': 23},
-            {'nazwa': 'Produkt 2', 'cena_netto': 30.0, 'vat': 8},
-            {'nazwa': 'Produkt 3', 'cena_netto': 70.0, 'vat': 23},
-            {'nazwa': 'Produkt 4', 'cena_netto': 20.0, 'vat': 8},
-            {'nazwa': 'Produkt 5', 'cena_netto': 60.0, 'vat': 23}
+            Product('Produkt 1', 50.0, 23, 100),
+            Product('Produkt 2', 30.0, 8, 50),
+            Product('Produkt 3', 70.0, 23, 75),
+            Product('Produkt 4', 20.0, 8, 120),
+            Product('Produkt 5', 60.0, 23, 90)
         ]
+
+        self.transactions = []
 
         # Widgets
         self.invoice_text_edit = QTextEdit(self)
@@ -59,9 +73,37 @@ class InvoiceApp(QWidget):
         self.send_email_button.clicked.connect(self.send_email)
         self.send_email_button.setStyleSheet('background-color: #f44336; color: white;')
 
+        self.product_table = QTableWidget(self)
+        self.product_table.setColumnCount(4)
+        self.product_table.setHorizontalHeaderLabels(['Nazwa', 'Cena Netto', 'VAT', 'Stan Magazynowy'])
+        self.product_table.setRowCount(len(self.products))
+        self.product_table.setEditTriggers(QTableWidget.NoEditTriggers)  # Blokowanie edycji komórek
+
+        for i, product in enumerate(self.products):
+            self.product_table.setItem(i, 0, QTableWidgetItem(product.name))
+            self.product_table.setItem(i, 1, QTableWidgetItem(str(product.price_netto)))
+            self.product_table.setItem(i, 2, QTableWidgetItem(str(product.vat)))
+            self.product_table.setItem(i, 3, QTableWidgetItem(str(product.stock)))
+
+        self.customer_info_layout = QFormLayout()
+        self.customer_info_layout.addRow('Imię i Nazwisko:', QLineEdit())
+        self.customer_info_layout.addRow('Adres:', QLineEdit())
+        self.customer_info_layout.addRow('Email:', QLineEdit())
+        self.customer_info_layout.addRow('Telefon:', QLineEdit())
+
+        self.add_transaction_button = QPushButton('Dodaj Produkt do Faktury', self)
+        self.add_transaction_button.clicked.connect(self.add_transaction)
+
         # Layout
         main_layout = QVBoxLayout(self)
         main_layout.setSpacing(20)
+
+        product_layout = QVBoxLayout()
+        product_layout.addWidget(QLabel('Dostępne Produkty'))
+        product_layout.addWidget(self.product_table)
+        product_layout.addWidget(self.add_transaction_button)
+
+        main_layout.addLayout(product_layout)
 
         invoice_layout = QVBoxLayout()
         invoice_layout.addWidget(QLabel('Podgląd Faktury'))
@@ -75,7 +117,28 @@ class InvoiceApp(QWidget):
 
         main_layout.addLayout(button_layout)
 
-        self.update_invoice_preview()
+        customer_info_groupbox = QGroupBox('Dane Klienta')
+        customer_info_groupbox.setLayout(self.customer_info_layout)
+        main_layout.addWidget(customer_info_groupbox)
+
+    def add_transaction(self):
+        selected_row = self.product_table.currentRow()
+        if selected_row >= 0:
+            quantity, ok = self.get_quantity_input()
+            if ok:
+                selected_product = self.products[selected_row]
+                if selected_product.stock >= quantity:
+                    selected_product.stock -= quantity
+                    self.transactions.append(Transaction(selected_product, quantity))
+                    self.update_invoice_preview()
+                else:
+                    QMessageBox.warning(self, 'Stan Magazynowy', 'Nie wystarczająca ilość produktu na magazynie.')
+        else:
+            QMessageBox.warning(self, 'Brak Wybranego Produktu', 'Proszę wybrać produkt z tabeli.')
+
+    def get_quantity_input(self):
+        quantity, ok = QInputDialog.getInt(self, 'Ilość', 'Podaj ilość produktu:')
+        return quantity, ok
 
     def update_invoice_preview(self):
         self.invoice_text_edit.clear()
@@ -94,25 +157,28 @@ class InvoiceApp(QWidget):
                                       f'Email: {self.client_data["email"]}\n'
                                       f'Telefon: {self.client_data["telefon"]}\n\n')
 
-        # Dodaj tabelę z produktami
-        self.invoice_text_edit.append('Produkty:\n')
-        table_text = '{:<20} {:<15} {:<15} {:<15}'.format('Nazwa', 'Cena Netto', 'VAT', 'Cena Brutto')
+        # Dodaj tabelę z transakcjami
+        self.invoice_text_edit.append('Produkty w Fakturze:\n')
+        table_text = '{:<20} {:<10} {:<10} {:<10} {:<10}'.format('Nazwa', 'Ilość', 'Cena Netto', 'VAT', 'Cena Brutto')
         self.invoice_text_edit.append(table_text)
         self.invoice_text_edit.append('-' * len(table_text))
 
         suma_netto = 0
         suma_brutto = 0
 
-        for product in self.products:
-            cena_netto = product['cena_netto']
-            vat = product['vat']
+        for transaction in self.transactions:
+            product = transaction.product
+            quantity = transaction.quantity
+
+            cena_netto = product.price_netto * quantity
+            vat = product.vat
             cena_brutto = cena_netto + cena_netto * (vat / 100)
 
             suma_netto += cena_netto
             suma_brutto += cena_brutto
 
-            row_text = '{:<20} {:<15.2f} {:<15} {:<15.2f}'.format(
-                product['nazwa'], cena_netto, f'{vat}%', cena_brutto)
+            row_text = '{:<20} {:<10} {:<10.2f} {:<10} {:<10.2f}'.format(
+                product.name, quantity, cena_netto, f'{vat}%', cena_brutto)
             self.invoice_text_edit.append(row_text)
 
         self.invoice_text_edit.append('\nŁączna suma Netto: {:.2f}'.format(suma_netto))
@@ -167,6 +233,7 @@ if __name__ == '__main__':
     window = InvoiceApp()
     window.show()
     sys.exit(app.exec())
+
 
 
 
