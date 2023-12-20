@@ -6,6 +6,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
+from reportlab.pdfgen import canvas
 
 class InvoiceApp(QWidget):
     def __init__(self):
@@ -19,30 +20,39 @@ class InvoiceApp(QWidget):
         # Widgets
         self.product_list = QListWidget(self)
         self.product_list.addItems(['Product 1', 'Product 2', 'Product 3', 'Product 4', 'Product 5'])
+        self.product_list.setStyleSheet('background-color: #f0f0f0;')
 
         self.quantity_label = QLabel('Quantity:', self)
         self.quantity_input = QLineEdit(self)
+        self.quantity_input.setStyleSheet('background-color: #e0e0e0;')
 
         self.price_label = QLabel('Price (brutto):', self)
         self.price_input = QLineEdit(self)
+        self.price_input.setStyleSheet('background-color: #e0e0e0;')
 
         self.vat_label = QLabel('VAT (%):', self)
         self.vat_input = QLineEdit(self)
+        self.vat_input.setStyleSheet('background-color: #e0e0e0;')
 
         self.description_label = QLabel('Description:', self)
         self.description_input = QLineEdit(self)
+        self.description_input.setStyleSheet('background-color: #e0e0e0;')
 
         self.ean_label = QLabel('EAN:', self)
         self.ean_input = QLineEdit(self)
+        self.ean_input.setStyleSheet('background-color: #e0e0e0;')
 
         self.add_button = QPushButton('Add Item', self)
         self.add_button.clicked.connect(self.add_item)
+        self.add_button.setStyleSheet('background-color: #4CAF50; color: white;')
 
         self.print_button = QPushButton('Print Invoice', self)
         self.print_button.clicked.connect(self.print_invoice)
+        self.print_button.setStyleSheet('background-color: #008CBA; color: white;')
 
         self.send_email_button = QPushButton('Send Email', self)
         self.send_email_button.clicked.connect(self.send_email)
+        self.send_email_button.setStyleSheet('background-color: #f44336; color: white;')
 
         self.layout = QVBoxLayout(self)
 
@@ -95,8 +105,13 @@ class InvoiceApp(QWidget):
         dialog = QPrintDialog(printer, self)
 
         if dialog.exec_() == QPrintDialog.Accepted:
-            self.invoice_text_edit.print_(printer)
-
+            painter = canvas.Canvas('invoice.pdf')
+            invoice_content = self.invoice_text_edit.toPlainText()
+            painter.drawString(100, 800, f'Invoice from {self.sender_company["name"]} to {self.receiver_company["name"]}')
+            painter.drawString(100, 780, '-' * 50)
+            painter.drawString(100, 760, invoice_content)
+            painter.save()
+            
     def send_email(self):
         try:
             server = smtplib.SMTP('your_smtp_server.com', 587)
@@ -113,10 +128,9 @@ class InvoiceApp(QWidget):
 
             message.attach(MIMEText(body, 'plain'))
 
-            # Attach invoice as a PDF file (you need to save the QTextEdit content as a PDF file)
-            # attachment = MIMEApplication(open('invoice.pdf', 'rb').read(), _subtype="pdf")
-            # attachment.add_header('Content-Disposition', 'attachment', filename='invoice.pdf')
-            # message.attach(attachment)
+            attachment = MIMEApplication(open('invoice.pdf', 'rb').read(), _subtype="pdf")
+            attachment.add_header('Content-Disposition', 'attachment', filename='invoice.pdf')
+            message.attach(attachment)
 
             server.sendmail(self.sender_company['email'], self.receiver_company['email'], message.as_string())
             server.quit()
@@ -130,4 +144,6 @@ if __name__ == '__main__':
     window = InvoiceApp()
     window.show()
     sys.exit(app.exec())
+
+
 
