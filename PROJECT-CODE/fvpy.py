@@ -1,12 +1,16 @@
 import sys
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QListWidget, QTextEdit, QMessageBox
+from PySide6.QtWidgets import (
+    QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTableWidget,
+    QTableWidgetItem, QTextEdit, QFormLayout, QGroupBox, QStyleFactory, QSpacerItem, QSizePolicy, QGridLayout, QMessageBox
+)
 from PyQt5.QtPrintSupport import QPrinter, QPrintDialog
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from reportlab.pdfgen import canvas
+import random
 
 class InvoiceApp(QWidget):
     def __init__(self):
@@ -15,135 +19,159 @@ class InvoiceApp(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        self.setWindowTitle('Invoice Application')
+        self.setWindowTitle('Aplikacja Fakturowa')
+        self.setGeometry(100, 100, 800, 600)
+
+        # Dane firmy
+        self.company_data = {
+            'nazwa': '',
+            'adres': '',
+            'email': '',
+            'telefon': ''
+        }
+
+        # Dane klienta
+        self.client_data = {
+            'nazwa': '',
+            'adres': '',
+            'email': '',
+            'telefon': ''
+        }
+
+        # Produkty
+        self.products = [
+            {'nazwa': 'Produkt 1', 'cena_netto': 50.0, 'vat': 23},
+            {'nazwa': 'Produkt 2', 'cena_netto': 30.0, 'vat': 8},
+            {'nazwa': 'Produkt 3', 'cena_netto': 70.0, 'vat': 23},
+            {'nazwa': 'Produkt 4', 'cena_netto': 20.0, 'vat': 8},
+            {'nazwa': 'Produkt 5', 'cena_netto': 60.0, 'vat': 23}
+        ]
 
         # Widgets
-        self.product_list = QListWidget(self)
-        self.product_list.addItems(['Product 1', 'Product 2', 'Product 3', 'Product 4', 'Product 5'])
-        self.product_list.setStyleSheet('background-color: #f0f0f0;')
+        self.invoice_text_edit = QTextEdit(self)
+        self.invoice_text_edit.setReadOnly(True)
 
-        self.quantity_label = QLabel('Quantity:', self)
-        self.quantity_input = QLineEdit(self)
-        self.quantity_input.setStyleSheet('background-color: #e0e0e0;')
-
-        self.price_label = QLabel('Price (brutto):', self)
-        self.price_input = QLineEdit(self)
-        self.price_input.setStyleSheet('background-color: #e0e0e0;')
-
-        self.vat_label = QLabel('VAT (%):', self)
-        self.vat_input = QLineEdit(self)
-        self.vat_input.setStyleSheet('background-color: #e0e0e0;')
-
-        self.description_label = QLabel('Description:', self)
-        self.description_input = QLineEdit(self)
-        self.description_input.setStyleSheet('background-color: #e0e0e0;')
-
-        self.ean_label = QLabel('EAN:', self)
-        self.ean_input = QLineEdit(self)
-        self.ean_input.setStyleSheet('background-color: #e0e0e0;')
-
-        self.add_button = QPushButton('Add Item', self)
-        self.add_button.clicked.connect(self.add_item)
-        self.add_button.setStyleSheet('background-color: #4CAF50; color: white;')
-
-        self.print_button = QPushButton('Print Invoice', self)
-        self.print_button.clicked.connect(self.print_invoice)
+        self.print_button = QPushButton('Drukuj Fakturę', self)
+        self.print_button.clicked.connect(self.show_invoice_preview)
         self.print_button.setStyleSheet('background-color: #008CBA; color: white;')
 
-        self.send_email_button = QPushButton('Send Email', self)
+        self.send_email_button = QPushButton('Wyślij Email', self)
         self.send_email_button.clicked.connect(self.send_email)
         self.send_email_button.setStyleSheet('background-color: #f44336; color: white;')
 
-        self.layout = QVBoxLayout(self)
+        # Layout
+        main_layout = QVBoxLayout(self)
+        main_layout.setSpacing(20)
 
-        self.layout.addWidget(self.product_list)
-        self.layout.addWidget(self.quantity_label)
-        self.layout.addWidget(self.quantity_input)
-        self.layout.addWidget(self.price_label)
-        self.layout.addWidget(self.price_input)
-        self.layout.addWidget(self.vat_label)
-        self.layout.addWidget(self.vat_input)
-        self.layout.addWidget(self.description_label)
-        self.layout.addWidget(self.description_input)
-        self.layout.addWidget(self.ean_label)
-        self.layout.addWidget(self.ean_input)
-        self.layout.addWidget(self.add_button)
-        self.layout.addWidget(self.print_button)
-        self.layout.addWidget(self.send_email_button)
+        invoice_layout = QVBoxLayout()
+        invoice_layout.addWidget(QLabel('Podgląd Faktury'))
+        invoice_layout.addWidget(self.invoice_text_edit)
 
-        self.invoice_text_edit = QTextEdit(self)
-        self.layout.addWidget(self.invoice_text_edit)
+        main_layout.addLayout(invoice_layout)
 
-        # Dummy company data
-        self.sender_company = {
-            'name': 'Your Company Name',
-            'address': '123 Main Street, City, Country',
-            'email': 'yourcompany@example.com',
-            'phone': '123-456-7890'
-        }
+        button_layout = QVBoxLayout()
+        button_layout.addWidget(self.print_button)
+        button_layout.addWidget(self.send_email_button)
 
-        self.receiver_company = {
-            'name': 'Client Company',
-            'address': '456 Client Street, City, Country',
-            'email': 'client@example.com',
-            'phone': '987-654-3210'
-        }
+        main_layout.addLayout(button_layout)
 
-    def add_item(self):
-        selected_product = self.product_list.currentItem().text()
-        quantity = self.quantity_input.text()
-        price = self.price_input.text()
-        vat = self.vat_input.text()
-        description = self.description_input.text()
-        ean = self.ean_input.text()
+        self.update_invoice_preview()
 
-        item_info = f'{quantity} x {selected_product}, Price: {price}, VAT: {vat}, Description: {description}, EAN: {ean}'
-        self.invoice_text_edit.append(item_info)
+    def update_invoice_preview(self):
+        self.invoice_text_edit.clear()
 
-    def print_invoice(self):
-        printer = QPrinter(QPrinter.HighResolution)
-        dialog = QPrintDialog(printer, self)
+        # Dodaj dane firmy
+        self.invoice_text_edit.append(f'Dane Twojej Firmy:\n\n'
+                                      f'Nazwa: {self.company_data["nazwa"]}\n'
+                                      f'Adres: {self.company_data["adres"]}\n'
+                                      f'Email: {self.company_data["email"]}\n'
+                                      f'Telefon: {self.company_data["telefon"]}\n\n')
 
-        if dialog.exec_() == QPrintDialog.Accepted:
-            painter = canvas.Canvas('invoice.pdf')
-            invoice_content = self.invoice_text_edit.toPlainText()
-            painter.drawString(100, 800, f'Invoice from {self.sender_company["name"]} to {self.receiver_company["name"]}')
-            painter.drawString(100, 780, '-' * 50)
-            painter.drawString(100, 760, invoice_content)
-            painter.save()
-            
+        # Dodaj dane klienta
+        self.invoice_text_edit.append(f'Dane Klienta:\n\n'
+                                      f'Nazwa: {self.client_data["nazwa"]}\n'
+                                      f'Adres: {self.client_data["adres"]}\n'
+                                      f'Email: {self.client_data["email"]}\n'
+                                      f'Telefon: {self.client_data["telefon"]}\n\n')
+
+        # Dodaj tabelę z produktami
+        self.invoice_text_edit.append('Produkty:\n')
+        table_text = '{:<20} {:<15} {:<15} {:<15}'.format('Nazwa', 'Cena Netto', 'VAT', 'Cena Brutto')
+        self.invoice_text_edit.append(table_text)
+        self.invoice_text_edit.append('-' * len(table_text))
+
+        suma_netto = 0
+        suma_brutto = 0
+
+        for product in self.products:
+            cena_netto = product['cena_netto']
+            vat = product['vat']
+            cena_brutto = cena_netto + cena_netto * (vat / 100)
+
+            suma_netto += cena_netto
+            suma_brutto += cena_brutto
+
+            row_text = '{:<20} {:<15.2f} {:<15} {:<15.2f}'.format(
+                product['nazwa'], cena_netto, f'{vat}%', cena_brutto)
+            self.invoice_text_edit.append(row_text)
+
+        self.invoice_text_edit.append('\nŁączna suma Netto: {:.2f}'.format(suma_netto))
+        self.invoice_text_edit.append('Łączna suma Brutto: {:.2f}'.format(suma_brutto))
+
+    def show_invoice_preview(self):
+        invoice_preview = QTextEdit()
+        invoice_preview.setPlainText(self.invoice_text_edit.toPlainText())
+
+        preview_window = QWidget(self)
+        preview_window.setWindowTitle('Podgląd Faktury')
+        preview_window.setGeometry(200, 200, 600, 400)
+        layout = QVBoxLayout(preview_window)
+        layout.addWidget(invoice_preview)
+
+        print_dialog = QPrintDialog()
+        if print_dialog.exec_() == QPrintDialog.Accepted:
+            printer = QPrinter()
+            printer.setOutputFileName('faktura.pdf')
+            invoice_preview.print_(printer)
+
     def send_email(self):
         try:
-            server = smtplib.SMTP('your_smtp_server.com', 587)
-            server.starttls()
-            server.login('your_email@example.com', 'your_email_password')
+            serwer = smtplib.SMTP('twoj_serwer_smtp.com', 587)
+            serwer.starttls()
+            serwer.login('twoj_email@example.com', 'twoje_haslo_email')
 
-            subject = 'Invoice from Your Company'
-            body = self.invoice_text_edit.toPlainText()
+            temat = 'Faktura od Twojej Firmy'
+            tresc = self.invoice_text_edit.toPlainText()
 
-            message = MIMEMultipart()
-            message['From'] = self.sender_company['email']
-            message['To'] = self.receiver_company['email']
-            message['Subject'] = subject
+            wiadomosc = MIMEMultipart()
+            wiadomosc['From'] = self.company_data['email']
+            wiadomosc['To'] = self.client_data['email']
+            wiadomosc['Subject'] = temat
 
-            message.attach(MIMEText(body, 'plain'))
+            wiadomosc.attach(MIMEText(tresc, 'plain'))
 
-            attachment = MIMEApplication(open('invoice.pdf', 'rb').read(), _subtype="pdf")
-            attachment.add_header('Content-Disposition', 'attachment', filename='invoice.pdf')
-            message.attach(attachment)
+            zalacznik = MIMEApplication(open('faktura.pdf', 'rb').read(), _subtype="pdf")
+            zalacznik.add_header('Content-Disposition', 'attachment', filename='faktura.pdf')
+            wiadomosc.attach(zalacznik)
 
-            server.sendmail(self.sender_company['email'], self.receiver_company['email'], message.as_string())
-            server.quit()
+            serwer.sendmail(self.company_data['email'], self.client_data['email'], wiadomosc.as_string())
+            serwer.quit()
 
-            QMessageBox.information(self, 'Email Sent', 'Invoice sent successfully.')
+            QMessageBox.information(self, 'Email Wysłany', 'Faktura wysłana pomyślnie.')
         except Exception as e:
-            QMessageBox.warning(self, 'Error', f'Error sending email: {str(e)}')
+            QMessageBox.warning(self, 'Błąd', f'Błąd podczas wysyłania emaila: {str(e)}')
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    app.setStyle(QStyleFactory.create('Fusion'))
     window = InvoiceApp()
     window.show()
     sys.exit(app.exec())
+
+
+
+
+
 
 
 
